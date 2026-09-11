@@ -1,32 +1,31 @@
-# React + TypeScript + Vite
+# 图片对比工具（Image Compare）
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+一款用于快速比较两张图片差异的桌面应用。
 
-Currently, two official plugins are available:
+## 功能特点
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 支持导入两张图片进行对比
+- 支持并排查看图片
+- 支持滑块对比模式
+- 支持查看图片细节
+- 简洁直观的桌面操作界面
 
-## React Compiler
+## 软件截图
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+后续可在这里添加软件界面截图。
 
-## Expanding the Oxlint configuration
+## 技术栈
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- Electron
+- React
+- TypeScript
+- Vite
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 安装与运行
+
+确保电脑已经安装 Node.js，然后执行：
+
+```bash
+npm install
+npm run dev
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
