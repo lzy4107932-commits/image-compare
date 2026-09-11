@@ -14,14 +14,13 @@
 
 ## 软件截图
 
-软件界面截图：
 单图界面——
 <img width="3072" height="1824" alt="image" src="https://github.com/user-attachments/assets/032aa90d-f267-4b55-8422-e4f80dd1e76d" />
 
 A/B图对比界面——
-左右对比模式：
-<img width="3072" height="1824" alt="image" src="https://github.com/user-attachments/assets/894f6895-e5d9-4091-a252-cc606006f6f2" />
 重叠对比模式：
+<img width="3072" height="1824" alt="image" src="https://github.com/user-attachments/assets/894f6895-e5d9-4091-a252-cc606006f6f2" />
+左右对比模式：
 <img width="3072" height="1920" alt="image" src="https://github.com/user-attachments/assets/a9b9aca1-180f-4ee8-a377-caf21a08f049" />
 多图对比——
 <img width="3072" height="1920" alt="image" src="https://github.com/user-attachments/assets/35143893-1991-4afa-99cf-ff2305157e1f" />
