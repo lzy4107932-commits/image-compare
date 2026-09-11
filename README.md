@@ -13,6 +13,7 @@
 ## 软件截图
 
 后续可在这里添加软件界面截图。
+<img width="3072" height="1920" alt="image" src="https://github.com/user-attachments/assets/2a53585e-3b69-4a9c-879f-5bc2ac11b459" />
 
 ## 技术栈
 
