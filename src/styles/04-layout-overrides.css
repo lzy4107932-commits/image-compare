@@ -1,0 +1,1121 @@
+/* ==================================================
+   最终布局：快捷键提示统一移动到底部状态栏
+   必须放在 App.css 最后
+   ================================================== */
+
+/*
+ * 旧提示节点的保险规则。
+ * 即使以后 JSX 中误保留这些节点，也不会再次占用画布空间。
+ */
+.canvas-hints,
+.ab-independent-help,
+.multi-compare-help {
+  display: none !important;
+}
+
+/*
+ * 查看器必须允许内部画布正确压缩和扩展。
+ */
+.viewer {
+  min-width: 0;
+  min-height: 0;
+}
+
+/*
+ * 画布占据工具栏和状态栏之外的全部剩余空间。
+ */
+.canvas {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/*
+ * 底部状态栏保持单行显示。
+ *
+ * 四个区域分别为：
+ * 1. 图片总数
+ * 2. 当前文件名或 A/B 文件名
+ * 3. 快捷键操作提示
+ * 4. 当前模式、缩放和旋转信息
+ */
+.statusbar {
+  width: 100%;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 12px;
+
+  display: grid;
+  grid-template-columns:
+    max-content
+    minmax(0, 1fr)
+    max-content;
+  align-items: center;
+  gap: 12px;
+
+  flex: 0 0 34px;
+  overflow: hidden;
+
+  color: var(--theme-muted);
+  border-top: 1px solid var(--theme-border);
+  background: var(--theme-surface-secondary);
+
+  font-size: 11px;
+  line-height: 32px;
+  user-select: none;
+}
+
+/*
+ * 覆盖文件前面的通用：
+ * .statusbar span { ... }
+ * 以及窄屏下 max-width: 50% 的旧规则。
+ */
+.statusbar > span {
+  min-width: 0;
+  max-width: none;
+
+  display: block;
+  overflow: hidden;
+
+  line-height: 32px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 左侧：图片总数 */
+.statusbar-count {
+  color: var(--theme-muted);
+  text-align: left;
+}
+
+/* 中间主要区域：快捷键操作提示 */
+.statusbar-help {
+  padding: 0 12px;
+
+  color: var(--theme-text-secondary);
+  border-right: 1px solid var(--theme-border);
+  border-left: 1px solid var(--theme-border);
+
+  text-align: center;
+}
+
+/* 右侧：缩放、旋转或当前模式 */
+.statusbar-meta {
+  color: var(--theme-muted);
+  text-align: right;
+}
+
+/*
+ * A/B 模式删除原帮助栏后，
+ * 中间视图自动占据全部可用高度。
+ */
+.ab-independent-view {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/*
+ * A/B 左右对比和重叠对比区域继续扩展。
+ */
+.ab-side-view,
+.ab-overlay-view {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/*
+ * 多图模式删除原来的 sticky 提示后，
+ * 网格区域自动占据剩余空间。
+ */
+.multi-compare-shell {
+  min-height: 100%;
+}
+
+.grid-view.multi-compare-view {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/* 中等宽度下隐藏文件名，为快捷键提示留出空间 */
+@media (max-width: 1200px) {
+  .statusbar {
+    grid-template-columns:
+      minmax(100px, auto)
+      minmax(0, 1fr)
+      minmax(140px, auto);
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .statusbar-selection {
+    display: none !important;
+  }
+
+  .statusbar-help {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+/* 窄窗口下优先保留快捷键和右侧状态 */
+@media (max-width: 800px) {
+  .statusbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .statusbar-count {
+    display: none !important;
+  }
+
+  .statusbar-help {
+    border-left: 0;
+    text-align: left;
+  }
+
+  .statusbar-meta {
+    max-width: 220px;
+  }
+}
+
+/* 手机宽度下仅显示快捷键提示 */
+@media (max-width: 600px) {
+  .statusbar {
+    grid-template-columns: minmax(0, 1fr);
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .statusbar-help {
+    padding: 0;
+    border-right: 0;
+    border-left: 0;
+    text-align: center;
+  }
+
+  .statusbar-meta {
+    display: none !important;
+  }
+}
+/* ==================================================
+   多图视图紧凑布局：最大化图片对比区域
+   必须放在 App.css 最后
+   ================================================== */
+
+/* 缩小多图容器四周留白以及卡片之间的间距 */
+.grid-view.multi-compare-view {
+  padding: 2px !important;
+  gap: 2px !important;
+}
+
+/* 缩小卡片边框圆角，减少视觉留白 */
+.grid-view.multi-compare-view .multi-compare-card {
+  border-radius: 3px;
+}
+
+/* 图片区域不再额外留出内部空间 */
+.grid-view.multi-compare-view .multi-compare-image-area {
+  padding: 0;
+}
+
+/*
+ * 原来的图片最大宽高是 90%，会在图片和卡片边框之间
+ * 留下明显空隙。改为 100%，让图片尽可能占满显示区域。
+ */
+.grid-view.multi-compare-view .multi-compare-image-area img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 压缩每张图片底部的名称栏，但继续保留文件名 */
+.grid-view.multi-compare-view .grid-card-name {
+  height: 30px;
+  padding: 0 6px;
+  line-height: 30px;
+}
+/* ==================================================
+   查看器顶部统一工具栏插槽
+   ================================================== */
+
+.viewer-toolbar {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(140px, 1fr)
+    minmax(0, auto)
+    minmax(140px, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+/* 左侧：当前视图名称 */
+.viewer-toolbar > .current-mode {
+  min-width: 0;
+  justify-self: start;
+}
+
+/* 中间：模式、操作对象等控制按钮 */
+.viewer-toolbar-center {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 右侧：缩放、复位等按钮 */
+.viewer-toolbar-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* 单图模式原有缩放按钮放在最右侧 */
+.viewer-toolbar > .zoom-controls:not(.grid-hidden-controls) {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
+/*
+ * React Portal 渲染进插槽后，
+ * 让内部按钮组保持紧凑排列。
+ */
+.viewer-toolbar-center > *,
+.viewer-toolbar-actions > * {
+  min-width: 0;
+}
+
+/* 窄窗口允许工具栏横向滚动，避免按钮挤坏 */
+@media (max-width: 1100px) {
+  .viewer-toolbar-center,
+  .viewer-toolbar-actions {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .viewer-toolbar-center::-webkit-scrollbar,
+  .viewer-toolbar-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .viewer-toolbar-center button,
+  .viewer-toolbar-actions button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+/* ==================================================
+   A/B 对比顶部工具栏最终布局
+   左侧：左右对比、重叠对比、同步、调整 A、调整 B
+   右侧：缩放和复位
+   必须放在 App.css 最末尾
+   ================================================== */
+
+/*
+ * A/B 模式下顶部工具栏改为左右两部分：
+ *
+ * 左侧：显示模式 + 操作对象
+ * 右侧：缩放和复位
+ *
+ * :has() 在 Electron 和现代 Chromium 中可正常使用。
+ */
+.viewer-toolbar:has(.ab-toolbar-portal-center) {
+  height: 54px;
+  min-height: 54px;
+  padding: 0 16px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 54px;
+  align-items: center;
+  gap: 16px;
+
+  overflow: hidden;
+}
+
+/* A/B 模式下隐藏或移开原来的当前模式文字，防止占用左侧位置 */
+.viewer-toolbar:has(.ab-toolbar-portal-center) > .current-mode {
+  display: none;
+}
+
+/* A/B 的显示方式和操作对象全部放在左侧 */
+.viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-center {
+  grid-column: 1;
+  grid-row: 1;
+
+  width: 100%;
+  min-width: 0;
+
+  justify-self: stretch;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  overflow: hidden;
+}
+
+/* A/B 缩放、复位工具放在右侧 */
+.viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-actions {
+  grid-column: 2;
+  grid-row: 1;
+
+  min-width: max-content;
+
+  justify-self: end;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/*
+ * 核心修复：
+ * 禁止“左右对比”和“同步”上下换行。
+ */
+.ab-toolbar-portal-center {
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+
+  white-space: nowrap;
+}
+
+/* 两个功能分组都必须保持单行 */
+.ab-toolbar-portal-center .ab-display-modes,
+.ab-toolbar-portal-center .ab-operation-modes {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  margin: 0;
+}
+
+/* ==================================================
+   显示方式分组：左右对比 / 重叠对比
+   ================================================== */
+
+.ab-toolbar-portal-center .ab-display-modes {
+  gap: 2px;
+  padding: 3px;
+
+  background: color-mix(in srgb, var(--theme-control) 80%, transparent);
+
+  border: 1px solid var(--theme-border);
+  border-radius: 9px;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 5%),
+    inset 0 1px 0 rgb(255 255 255 / 35%);
+}
+
+.ab-toolbar-portal-center .ab-display-modes button {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  color: var(--theme-text-secondary);
+  background: transparent;
+
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 100ms ease;
+}
+
+.ab-toolbar-portal-center .ab-display-modes button:hover:not(.active) {
+  color: var(--theme-text);
+  background: var(--theme-control-hover);
+}
+
+.ab-toolbar-portal-center .ab-display-modes button.active {
+  color: #ffffff;
+  background: var(--theme-accent);
+  box-shadow:
+    0 2px 5px rgb(37 99 235 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+
+.ab-toolbar-portal-center .ab-display-modes button:active {
+  transform: translateY(1px);
+}
+
+.ab-toolbar-portal-center .ab-display-modes svg {
+  flex: 0 0 auto;
+}
+
+/* ==================================================
+   中间分隔线
+   ================================================== */
+
+.ab-toolbar-portal-center .ab-toolbar-separator {
+  width: 1px;
+  height: 28px;
+  margin: 0 1px;
+
+  flex: 0 0 1px;
+
+  background: var(--theme-border);
+  border-radius: 1px;
+}
+
+/* ==================================================
+   操作对象分组：同步 / 调整 A / 调整 B
+   ================================================== */
+
+.ab-toolbar-portal-center .ab-operation-modes {
+  gap: 3px;
+  padding: 3px;
+
+  background: color-mix(in srgb, var(--theme-control) 80%, transparent);
+
+  border: 1px solid var(--theme-border);
+  border-radius: 9px;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 5%),
+    inset 0 1px 0 rgb(255 255 255 / 35%);
+}
+
+.ab-toolbar-portal-center .ab-operation-modes > span {
+  margin: 0 5px 0 7px;
+
+  color: var(--theme-muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ab-toolbar-portal-center .ab-operation-modes button {
+  height: 32px;
+  min-height: 32px;
+  min-width: 56px;
+  padding: 0 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--theme-text-secondary);
+  background: transparent;
+
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 100ms ease;
+}
+
+.ab-toolbar-portal-center .ab-operation-modes button:hover:not(.active) {
+  color: var(--theme-text);
+  background: var(--theme-control-hover);
+}
+
+.ab-toolbar-portal-center .ab-operation-modes button:active {
+  transform: translateY(1px);
+}
+
+/* 同步激活 */
+.ab-toolbar-portal-center .ab-operation-modes button.active.sync {
+  color: #ffffff;
+  background: var(--theme-accent);
+  box-shadow:
+    0 2px 5px rgb(37 99 235 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+
+/* 调整 A 激活 */
+.ab-toolbar-portal-center .ab-operation-modes button.active.image-a {
+  color: #ffffff;
+  background: var(--theme-a);
+  box-shadow:
+    0 2px 5px rgb(99 102 241 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+
+/* 调整 B 激活 */
+.ab-toolbar-portal-center .ab-operation-modes button.active.image-b {
+  color: #ffffff;
+  background: var(--theme-b);
+  box-shadow:
+    0 2px 5px rgb(14 116 144 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+
+/* ==================================================
+   右侧缩放和复位按钮
+   ================================================== */
+
+.viewer-toolbar-actions .ab-transform-controls {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 4px;
+
+  padding: 3px;
+
+  background: color-mix(in srgb, var(--theme-control) 80%, transparent);
+
+  border: 1px solid var(--theme-border);
+  border-radius: 9px;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 5%),
+    inset 0 1px 0 rgb(255 255 255 / 35%);
+
+  white-space: nowrap;
+}
+
+.viewer-toolbar-actions .ab-transform-controls button {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  color: var(--theme-text-secondary);
+  background: transparent;
+
+  border: 0;
+  border-radius: 6px;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 100ms ease;
+}
+
+.viewer-toolbar-actions .ab-transform-controls button:hover {
+  color: var(--theme-text);
+  background: var(--theme-control-hover);
+}
+
+.viewer-toolbar-actions .ab-transform-controls button:active {
+  transform: translateY(1px);
+}
+
+.viewer-toolbar-actions .ab-transform-controls .ab-zoom-value {
+  min-width: 58px;
+  padding-right: 8px;
+  padding-left: 8px;
+
+  color: var(--theme-accent);
+  background: var(--theme-surface);
+
+  border: 1px solid var(--theme-border);
+
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ==================================================
+   窄窗口处理
+   ================================================== */
+
+@media (max-width: 1250px) {
+  .viewer-toolbar:has(.ab-toolbar-portal-center) {
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .ab-toolbar-portal-center {
+    gap: 7px;
+  }
+
+  .ab-toolbar-portal-center .ab-toolbar-separator {
+    margin: 0;
+  }
+
+  .ab-toolbar-portal-center .ab-operation-modes > span {
+    display: none;
+  }
+
+  .ab-toolbar-portal-center .ab-display-modes button,
+  .ab-toolbar-portal-center .ab-operation-modes button {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .viewer-toolbar-actions .ab-transform-controls button {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 980px) {
+  /*
+   * 特别窄时允许整条工具栏横向滚动，
+   * 仍然不允许功能按钮上下换行。
+   */
+  .viewer-toolbar:has(.ab-toolbar-portal-center) {
+    grid-template-columns: max-content max-content;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-center {
+    width: max-content;
+    overflow: visible;
+  }
+
+  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-actions {
+    overflow: visible;
+  }
+}
+/* 多图视图右上角摘要 */
+.multi-view-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 5px 10px;
+
+  color: var(--theme-text);
+  font-family:
+    Inter, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  line-height: 1;
+  white-space: nowrap;
+}
+/* ==================================================
+   全局按钮立体化
+   参考 A/B 视图顶部“左右对比 / 重叠对比”按钮
+   A/B 顶部工具栏本身不参与此规则
+   ================================================== */
+
+/*
+ * 统一普通按钮的基础立体效果。
+ *
+ * 不包含以下 A/B 专用按钮：
+ * - .ab-toolbar-portal-center .ab-display-modes button
+ * - .ab-toolbar-portal-center .ab-operation-modes button
+ * - .viewer-toolbar-actions .ab-transform-controls button
+ * - .ab-independent-toolbar button
+ */
+.mode-button,
+.import-button,
+.upload-button,
+.clear-button,
+.language-switch,
+.theme-dropdown-trigger,
+.zoom-controls button,
+.canvas-tools button,
+.role-button,
+.multi-compare-toolbar-actions button {
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    inset 0 -1px 0 rgb(0 0 0 / 16%),
+    0 2px 4px rgb(0 0 0 / 22%);
+  transition:
+    color 0.14s ease,
+    background 0.14s ease,
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    transform 0.1s ease,
+    opacity 0.14s ease;
+}
+
+/* 普通深色按钮 */
+.mode-button,
+.clear-button,
+.language-switch,
+.theme-dropdown-trigger,
+.zoom-controls button,
+.canvas-tools button,
+.role-button,
+.multi-compare-toolbar-actions button {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-control-hover) 86%, white 14%) 0%,
+    var(--theme-control) 52%,
+    color-mix(in srgb, var(--theme-control) 88%, black 12%) 100%
+  );
+}
+
+/* 普通按钮悬停 */
+.mode-button:hover:not(:disabled),
+.clear-button:hover:not(:disabled),
+.language-switch:hover:not(:disabled),
+.theme-dropdown-trigger:hover:not(:disabled),
+.zoom-controls button:hover:not(:disabled),
+.canvas-tools button:hover:not(:disabled),
+.role-button:hover:not(:disabled),
+.multi-compare-toolbar-actions button:hover:not(:disabled) {
+  border-color: var(--theme-accent);
+  color: var(--theme-text);
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-control-hover) 94%, white 6%) 0%,
+    var(--theme-control-hover) 52%,
+    color-mix(in srgb, var(--theme-control-hover) 90%, black 10%) 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 16%),
+    inset 0 -1px 0 rgb(0 0 0 / 14%),
+    0 3px 7px rgb(0 0 0 / 28%);
+}
+
+/* 普通按钮按下 */
+.mode-button:active:not(:disabled),
+.clear-button:active:not(:disabled),
+.language-switch:active:not(:disabled),
+.theme-dropdown-trigger:active:not(:disabled),
+.zoom-controls button:active:not(:disabled),
+.canvas-tools button:active:not(:disabled),
+.role-button:active:not(:disabled),
+.multi-compare-toolbar-actions button:active:not(:disabled) {
+  transform: translateY(1px);
+
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 1px 1px rgb(0 0 0 / 20%);
+}
+
+/* 键盘焦点 */
+.mode-button:focus-visible,
+.import-button:focus-visible,
+.upload-button:focus-visible,
+.clear-button:focus-visible,
+.language-switch:focus-visible,
+.theme-dropdown-trigger:focus-visible,
+.zoom-controls button:focus-visible,
+.canvas-tools button:focus-visible,
+.role-button:focus-visible,
+.multi-compare-toolbar-actions button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+/* ==================================================
+   顶部视图模式按钮
+   ================================================== */
+
+header.topbar .mode-switch > button {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    inset 0 -1px 0 rgb(0 0 0 / 16%),
+    0 2px 4px rgb(0 0 0 / 22%) !important;
+}
+
+header.topbar .mode-switch > button:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 16%),
+    inset 0 -1px 0 rgb(0 0 0 / 14%),
+    0 3px 7px rgb(0 0 0 / 28%) !important;
+}
+
+header.topbar .mode-switch > button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 1px 1px rgb(0 0 0 / 20%) !important;
+}
+
+/* 顶部当前选中的视图按钮 */
+header.topbar .mode-switch > button.active {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-accent-hover) 90%, white 10%) 0%,
+    var(--theme-accent) 55%,
+    color-mix(in srgb, var(--theme-accent) 88%, black 12%) 100%
+  ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 24%),
+    inset 0 -1px 0 rgb(0 0 0 / 16%),
+    0 3px 7px rgb(37 99 235 / 34%) !important;
+}
+
+/* ==================================================
+   蓝色主操作按钮：导入图片
+   ================================================== */
+
+.topbar-actions > .import-button,
+.topbar-actions > .upload-button {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 25%),
+    inset 0 -1px 0 rgb(0 0 0 / 14%),
+    0 4px 10px rgb(54 103 220 / 26%);
+}
+
+.topbar-actions > .import-button:hover:not(:disabled),
+.topbar-actions > .upload-button:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 30%),
+    inset 0 -1px 0 rgb(0 0 0 / 12%),
+    0 6px 15px rgb(54 103 220 / 34%);
+  transform: translateY(-1px);
+}
+
+.topbar-actions > .import-button:active:not(:disabled),
+.topbar-actions > .upload-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 2px 4px rgb(54 103 220 / 24%);
+}
+
+/* ==================================================
+   普通选中按钮
+   ================================================== */
+
+.mode-button.active:not(:disabled),
+.role-button.active:not(:disabled),
+button[aria-pressed="true"]:not(:disabled),
+button[aria-selected="true"]:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    inset 0 -1px 0 rgb(0 0 0 / 14%),
+    0 3px 7px rgb(37 99 235 / 30%);
+}
+
+/* 左侧 A 按钮 */
+.role-button.role-a.active:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-accent-hover) 90%, white 10%) 0%,
+    var(--theme-accent) 55%,
+    color-mix(in srgb, var(--theme-accent) 88%, black 12%) 100%
+  );
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 23%),
+    inset 0 -1px 0 rgb(0 0 0 / 14%),
+    0 3px 7px rgb(37 99 235 / 32%);
+}
+
+/* 左侧 B 按钮 */
+.role-button.role-b.active:not(:disabled) {
+  background: linear-gradient(180deg, #269ab8 0%, #1687a7 55%, #10748f 100%);
+
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    inset 0 -1px 0 rgb(0 0 0 / 15%),
+    0 3px 7px rgb(14 116 144 / 32%);
+}
+
+/* ==================================================
+   禁用状态
+   ================================================== */
+
+.mode-button:disabled,
+.import-button:disabled,
+.upload-button:disabled,
+.clear-button:disabled,
+.language-switch:disabled,
+.theme-dropdown-trigger:disabled,
+.zoom-controls button:disabled,
+.canvas-tools button:disabled,
+.role-button:disabled,
+.multi-compare-toolbar-actions button:disabled {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 1px 2px rgb(0 0 0 / 12%);
+  cursor: not-allowed;
+}
+
+/* ==================================================
+   明确保护 A/B 对比视图原有按钮
+   ================================================== */
+
+/*
+ * 下面几组规则只恢复原来的效果，
+ * 防止以后新增的通用按钮规则误伤 A/B 顶部按钮。
+ */
+
+.ab-toolbar-portal-center .ab-display-modes button,
+.ab-toolbar-portal-center .ab-operation-modes button,
+.viewer-toolbar-actions .ab-transform-controls button {
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 100ms ease;
+}
+/* ==================================================
+   单图 / 多图顶部工具栏紧凑化
+   必须放在 App.css 最末尾
+   A/B 对比工具栏保持原来的 54px 高度
+   ================================================== */
+
+:root {
+  --compact-viewer-toolbar-height: 42px;
+}
+
+/*
+ * 只处理单图和多图。
+ * A/B 模式中存在 .ab-toolbar-portal-center，因此会被排除。
+ */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) {
+  width: 100%;
+  height: var(--compact-viewer-toolbar-height);
+  min-height: var(--compact-viewer-toolbar-height);
+  max-height: var(--compact-viewer-toolbar-height);
+  padding: 0 10px;
+
+  grid-template-rows: var(--compact-viewer-toolbar-height);
+  align-items: center;
+
+  flex: 0 0 var(--compact-viewer-toolbar-height);
+  overflow: hidden;
+}
+
+/* 左侧“单图视图 / 多图视图”垂直居中 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) > .current-mode {
+  height: 100%;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+}
+
+/* 中间插槽不再产生额外的上下留白 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) > .viewer-toolbar-center {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+/* 右侧操作区域不再产生额外的上下留白 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) > .viewer-toolbar-actions {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+/* 单图右侧缩放按钮组 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+  > .zoom-controls:not(.grid-hidden-controls) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  align-self: center;
+  align-items: center;
+}
+
+/* 单图和多图按钮统一为 28px 高 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) .zoom-controls button,
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+  .multi-compare-toolbar-actions
+  button {
+  height: 28px;
+  min-height: 28px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* 百分比按钮宽度保持稳定 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) .zoom-controls .zoom-value,
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+  .multi-compare-toolbar-actions
+  .multi-zoom-value {
+  min-width: 58px;
+}
+
+/* ==================================================
+   多图模式内部工具栏紧凑化
+   ================================================== */
+
+/*
+ * 如果多图模式仍然渲染 .multi-compare-toolbar，
+ * 将其高度同步压缩，防止内部工具栏把外层撑高。
+ */
+.multi-compare-toolbar {
+  height: 38px;
+  min-height: 38px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* 多图工具栏位于 viewer-toolbar 内部时，完全服从父级高度 */
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center)) .multi-compare-toolbar {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+
+  border-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 多图操作按钮组垂直居中 */
+.multi-compare-toolbar-actions {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+/* ==================================================
+   防止旧的窄屏规则重新把工具栏撑高
+   ================================================== */
+
+@media (max-width: 800px) {
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center)) {
+    height: var(--compact-viewer-toolbar-height);
+    min-height: var(--compact-viewer-toolbar-height);
+    max-height: var(--compact-viewer-toolbar-height);
+
+    flex-wrap: nowrap;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

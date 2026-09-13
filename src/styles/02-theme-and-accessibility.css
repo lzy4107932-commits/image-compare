@@ -1,0 +1,1688 @@
+/* ========================================
+   主题切换按钮
+   ======================================== */
+
+.theme-switcher {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 4px;
+
+  background-color: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.theme-switcher button {
+  min-width: 48px;
+  padding: 6px 10px;
+
+  color: var(--theme-text-secondary);
+  background-color: transparent;
+
+  border: 0;
+  border-radius: 6px;
+
+  font: inherit;
+  cursor: pointer;
+}
+
+.theme-switcher button:hover {
+  color: var(--theme-text);
+  background-color: var(--theme-surface-hover);
+}
+
+.theme-switcher button.active {
+  color: #ffffff;
+  background-color: var(--theme-accent);
+}
+
+.theme-switcher button.active:hover {
+  background-color: var(--theme-accent-hover);
+}
+
+.theme-switcher button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   临时应用基础主题颜色
+   ======================================== */
+
+html,
+body,
+#root {
+  color: var(--theme-text);
+  background-color: var(--theme-bg);
+}
+
+.app {
+  color: var(--theme-text);
+  background-color: var(--theme-bg);
+}
+/* ========================================
+   第一阶段主题适配：主框架、顶部栏、侧边栏
+   ======================================== */
+
+/* 补充各主题需要的语义颜色 */
+:root,
+:root[data-theme="dark"] {
+  --theme-surface-secondary: #17191e;
+  --theme-control: #23252b;
+  --theme-control-hover: #30333a;
+  --theme-selection: #292d4a;
+  --theme-selection-border: #5c63ca;
+  --theme-muted: #7e8490;
+  --theme-danger: #b8444c;
+  --theme-scrollbar: #3b3e47;
+  --theme-shadow: rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme="gray"] {
+  --theme-surface-secondary: #303338;
+  --theme-control: #40444b;
+  --theme-control-hover: #4c5159;
+  --theme-selection: #41465f;
+  --theme-selection-border: #7984dc;
+  --theme-muted: #a8adb5;
+  --theme-danger: #c44f58;
+  --theme-scrollbar: #5d626b;
+  --theme-shadow: rgba(0, 0, 0, 0.25);
+}
+
+:root[data-theme="light"] {
+  --theme-surface-secondary: #f7f9fb;
+  --theme-control: #f1f4f8;
+  --theme-control-hover: #e4e9f0;
+  --theme-selection: #e7efff;
+  --theme-selection-border: #5b83dc;
+  --theme-muted: #737b87;
+  --theme-danger: #c83f49;
+  --theme-scrollbar: #b9c0ca;
+  --theme-shadow: rgba(35, 42, 52, 0.14);
+}
+
+/* 应用程序基础区域 */
+.app {
+  color: var(--theme-text);
+  background: var(--theme-bg);
+}
+
+/* 顶部工具栏 */
+.topbar {
+  border-bottom-color: var(--theme-border);
+  background: var(--theme-surface);
+}
+
+.brand h1 {
+  color: var(--theme-text);
+}
+
+.brand p {
+  color: var(--theme-muted);
+}
+
+/* 顶部视图模式按钮
+   使用 !important 是为了覆盖文件前面已有的高优先级规则 */
+header.topbar .mode-switch > button {
+  color: var(--theme-text-secondary) !important;
+  background: var(--theme-control) !important;
+  border-color: var(--theme-border) !important;
+}
+
+header.topbar .mode-switch > button:hover:not(:disabled) {
+  color: var(--theme-text) !important;
+  background: var(--theme-control-hover) !important;
+  border-color: var(--theme-accent) !important;
+}
+
+header.topbar .mode-switch > button.active {
+  color: #ffffff !important;
+  background: var(--theme-accent) !important;
+  border-color: var(--theme-accent-hover) !important;
+}
+
+header.topbar .mode-switch > button:disabled {
+  color: var(--theme-muted) !important;
+  background: var(--theme-control) !important;
+  border-color: var(--theme-border) !important;
+  opacity: 0.55 !important;
+}
+
+header.topbar .mode-switch > button:disabled svg {
+  color: var(--theme-muted) !important;
+}
+
+/* 导入按钮 */
+.import-button,
+.upload-button {
+  color: #ffffff;
+  border-color: var(--theme-accent);
+  background: var(--theme-accent);
+}
+
+.import-button:hover,
+.upload-button:hover {
+  border-color: var(--theme-accent-hover);
+  background: var(--theme-accent-hover);
+}
+
+/* 清空按钮 */
+.clear-button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.clear-button:hover:not(:disabled) {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+/* 顶部禁用按钮 */
+.topbar-actions button:disabled {
+  color: var(--theme-muted);
+  background: var(--theme-control);
+  border-color: var(--theme-border);
+}
+
+.topbar-actions button:disabled svg {
+  color: var(--theme-muted);
+}
+
+/* 语言按钮 */
+.language-switch {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.language-switch:hover {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+/* 左侧栏 */
+.sidebar {
+  border-right-color: var(--theme-border);
+  background: var(--theme-surface-secondary);
+}
+
+.sidebar-header {
+  border-bottom-color: var(--theme-border);
+}
+
+.sidebar-header h2 {
+  color: var(--theme-text);
+}
+
+.sidebar-header span {
+  color: var(--theme-muted);
+}
+
+/* 图片列表为空时的提示 */
+.sidebar-empty {
+  color: var(--theme-muted);
+}
+
+/* 图片列表项目 */
+.image-item {
+  border-color: transparent;
+  background: var(--theme-control);
+  box-shadow: 0 1px 2px var(--theme-shadow);
+}
+
+.image-item:hover {
+  border-color: var(--theme-border);
+  background: var(--theme-control-hover);
+}
+
+.image-item.selected {
+  border-color: var(--theme-selection-border);
+  background: var(--theme-selection);
+}
+
+.image-item img {
+  background: var(--theme-bg);
+}
+
+.image-item-info strong {
+  color: var(--theme-text);
+}
+
+.image-item-info span {
+  color: var(--theme-muted);
+}
+
+/* 删除图片按钮 */
+.delete-image-button {
+  color: var(--theme-text-secondary);
+  background: var(--theme-surface-active);
+}
+
+.delete-image-button:hover {
+  color: #ffffff;
+  background: var(--theme-danger);
+}
+
+/* A/B 图片角色按钮 */
+.role-button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.role-button:hover {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+.role-button.role-a.active {
+  color: #ffffff;
+  border-color: var(--theme-accent-hover);
+  background: var(--theme-accent);
+}
+
+/* B 按钮继续保留青色，用于区分 A 和 B */
+.role-button.role-b.active {
+  color: #ffffff;
+  border-color: #2ba6c7;
+  background: #1687a7;
+}
+
+/* 滚动条 */
+.image-list::-webkit-scrollbar-track,
+.canvas::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.image-list::-webkit-scrollbar-thumb,
+.canvas::-webkit-scrollbar-thumb {
+  background: var(--theme-scrollbar);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.image-list::-webkit-scrollbar-thumb:hover,
+.canvas::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-text-secondary);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Firefox 滚动条 */
+.image-list,
+.canvas {
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-scrollbar) transparent;
+}
+/* ========================================
+   第二阶段主题适配：查看器、画布、状态栏
+   ======================================== */
+
+/* 查看器与画布使用的主题变量 */
+:root,
+:root[data-theme="dark"] {
+  --theme-viewer-bg: #0e0f12;
+  --theme-canvas-bg: #101114;
+  --theme-canvas-checker: #17191e;
+
+  --theme-glass-bg: rgba(20, 20, 28, 0.76);
+  --theme-glass-border: rgba(255, 255, 255, 0.09);
+  --theme-glass-text: rgba(255, 255, 255, 0.62);
+
+  --theme-image-shadow: rgba(0, 0, 0, 0.45);
+  --theme-drag-bg: rgba(42, 42, 75, 0.92);
+  --theme-drag-border: #7770ee;
+}
+
+:root[data-theme="gray"] {
+  --theme-viewer-bg: #25272b;
+  --theme-canvas-bg: #292b2f;
+  --theme-canvas-checker: #32353a;
+
+  --theme-glass-bg: rgba(43, 46, 52, 0.88);
+  --theme-glass-border: rgba(255, 255, 255, 0.12);
+  --theme-glass-text: rgba(255, 255, 255, 0.72);
+
+  --theme-image-shadow: rgba(0, 0, 0, 0.38);
+  --theme-drag-bg: rgba(55, 57, 94, 0.92);
+  --theme-drag-border: #8b85f2;
+}
+
+:root[data-theme="light"] {
+  --theme-viewer-bg: #e9edf2;
+  --theme-canvas-bg: #e7ebf0;
+  --theme-canvas-checker: #f4f6f9;
+
+  --theme-glass-bg: rgba(255, 255, 255, 0.9);
+  --theme-glass-border: rgba(35, 42, 52, 0.14);
+  --theme-glass-text: rgba(32, 36, 42, 0.7);
+
+  --theme-image-shadow: rgba(35, 42, 52, 0.22);
+  --theme-drag-bg: rgba(224, 228, 255, 0.94);
+  --theme-drag-border: #625bea;
+}
+
+/* 查看器主体 */
+.viewer {
+  color: var(--theme-text);
+  background: var(--theme-viewer-bg);
+}
+
+/* 查看器工具栏 */
+.viewer-toolbar {
+  border-bottom-color: var(--theme-border);
+  background: var(--theme-surface-secondary);
+}
+
+.current-mode {
+  color: var(--theme-text-secondary);
+}
+
+/* 缩放控制按钮 */
+.zoom-controls button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.zoom-controls button:hover:not(:disabled) {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+.zoom-controls button:active:not(:disabled) {
+  background: var(--theme-surface-active);
+}
+
+.zoom-controls button:disabled {
+  color: var(--theme-muted);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoom-controls .zoom-value {
+  color: var(--theme-text-secondary);
+}
+
+/* 中央棋盘格画布 */
+.canvas {
+  background-color: var(--theme-canvas-bg);
+  background-image:
+    linear-gradient(45deg, var(--theme-canvas-checker) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--theme-canvas-checker) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--theme-canvas-checker) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--theme-canvas-checker) 75%);
+}
+
+/* 单图阴影 */
+.single-view img {
+  box-shadow: 0 14px 45px var(--theme-image-shadow);
+}
+
+/* 空状态与普通警告 */
+.empty-state,
+.compare-warning,
+.multi-compare-warning {
+  color: var(--theme-muted);
+}
+
+.empty-state h2,
+.compare-warning h2,
+.multi-compare-warning h2 {
+  color: var(--theme-text);
+}
+
+.empty-icon {
+  color: var(--theme-accent);
+  border-color: var(--theme-border);
+  background: var(--theme-surface);
+  box-shadow: 0 16px 50px var(--theme-shadow);
+}
+
+/* 空状态提示标签 */
+.empty-tips span {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-surface);
+}
+
+/* 底部状态栏 */
+.statusbar {
+  color: var(--theme-muted);
+  border-top-color: var(--theme-border);
+  background: var(--theme-surface-secondary);
+}
+
+/* 画布快捷键提示 */
+.canvas-shortcuts {
+  color: var(--theme-glass-text);
+  border-color: var(--theme-glass-border);
+  background: var(--theme-glass-bg);
+  box-shadow: 0 6px 20px var(--theme-shadow);
+}
+
+.canvas-shortcuts span:not(:last-child)::after {
+  background: var(--theme-glass-border);
+}
+
+/* 画布右上角工具按钮 */
+.canvas-tools button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-glass-border);
+  background: var(--theme-glass-bg);
+  box-shadow: 0 2px 8px var(--theme-shadow);
+}
+
+.canvas-tools button:hover:not(:disabled) {
+  color: #ffffff;
+  border-color: var(--theme-accent-hover);
+  background: var(--theme-accent);
+}
+
+.canvas-tools button:disabled {
+  color: var(--theme-muted);
+  background: var(--theme-glass-bg);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 拖拽文件进入画布时的提示层 */
+.canvas.dragging-files {
+  outline-color: var(--theme-accent);
+}
+
+.canvas.dragging-files::after {
+  color: var(--theme-text);
+  border-color: var(--theme-drag-border);
+  background: var(--theme-drag-bg);
+  box-shadow:
+    inset 0 0 50px rgba(94, 87, 225, 0.16),
+    0 15px 50px var(--theme-shadow);
+}
+
+/* 键盘焦点可见性 */
+.zoom-controls button:focus-visible,
+.canvas-tools button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+/* ========================================
+   第三阶段主题适配：A/B 对比区域
+   ======================================== */
+
+/* A/B 对比专用语义颜色 */
+:root,
+:root[data-theme="dark"] {
+  --theme-compare-stage: #0e0f12;
+  --theme-compare-footer: #181a1f;
+  --theme-compare-divider: #555b68;
+
+  --theme-a: #625bea;
+  --theme-a-hover: #746df2;
+  --theme-a-border: #8a83ff;
+  --theme-a-soft: rgba(91, 85, 220, 0.92);
+
+  --theme-b: #1687a7;
+  --theme-b-hover: #1c9abb;
+  --theme-b-border: #33aaca;
+  --theme-b-soft: rgba(22, 135, 167, 0.92);
+
+  --theme-divider-glow: rgba(122, 113, 255, 0.8);
+}
+
+:root[data-theme="gray"] {
+  --theme-compare-stage: #25272b;
+  --theme-compare-footer: #35383d;
+  --theme-compare-divider: #626771;
+
+  --theme-a: #6862df;
+  --theme-a-hover: #7b75eb;
+  --theme-a-border: #938dff;
+  --theme-a-soft: rgba(104, 98, 223, 0.94);
+
+  --theme-b: #177f9c;
+  --theme-b-hover: #2096b5;
+  --theme-b-border: #39abc8;
+  --theme-b-soft: rgba(23, 127, 156, 0.94);
+
+  --theme-divider-glow: rgba(122, 113, 255, 0.68);
+}
+
+:root[data-theme="light"] {
+  --theme-compare-stage: #e9edf2;
+  --theme-compare-footer: #ffffff;
+  --theme-compare-divider: #c5cbd4;
+
+  --theme-a: #574fd0;
+  --theme-a-hover: #665ee0;
+  --theme-a-border: #7169e8;
+  --theme-a-soft: rgba(87, 79, 208, 0.94);
+
+  --theme-b: #087c9c;
+  --theme-b-hover: #0b8dac;
+  --theme-b-border: #1595b5;
+  --theme-b-soft: rgba(8, 124, 156, 0.94);
+
+  --theme-divider-glow: rgba(87, 79, 208, 0.42);
+}
+
+/* ========================================
+   A/B 对比方式切换
+   ======================================== */
+
+.compare-mode-switch {
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+  box-shadow: 0 2px 8px var(--theme-shadow);
+}
+
+.compare-mode-switch button {
+  color: var(--theme-text-secondary);
+  background: transparent;
+}
+
+.compare-mode-switch button:hover:not(:disabled) {
+  color: var(--theme-text);
+  background: var(--theme-control-hover);
+}
+
+.compare-mode-switch button.active {
+  color: #ffffff;
+  background: var(--theme-accent);
+}
+
+.compare-mode-switch button.active:hover {
+  background: var(--theme-accent-hover);
+}
+
+.compare-mode-switch button:disabled {
+  color: var(--theme-muted);
+  background: transparent;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.compare-mode-switch button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 1px;
+}
+
+/* ========================================
+   普通 A/B 并排对比
+   ======================================== */
+
+.compare-view {
+  color: var(--theme-text);
+  background: var(--theme-compare-stage);
+}
+
+.compare-panel {
+  background: var(--theme-compare-stage);
+}
+
+.compare-image-area {
+  background: var(--theme-compare-stage);
+}
+
+.compare-divider {
+  background: var(--theme-compare-divider);
+}
+
+/* 默认的 A 标识 */
+.compare-label {
+  color: #ffffff;
+  background: var(--theme-a-soft);
+  box-shadow: 0 3px 10px var(--theme-shadow);
+}
+
+/* 如果 B 标签同时使用 compare-label 和 ab-label-b */
+.compare-label.ab-label-b,
+.ab-label-b {
+  color: #ffffff;
+  background: var(--theme-b-soft);
+}
+
+/* 图片名称栏 */
+.compare-name {
+  color: var(--theme-text-secondary);
+  border-top-color: var(--theme-border);
+  background: var(--theme-compare-footer);
+}
+
+/* ========================================
+   旧版重叠拖动对比
+   ======================================== */
+
+.overlay-view {
+  color: var(--theme-text);
+  background: var(--theme-compare-stage);
+}
+
+.overlay-stage {
+  background: var(--theme-compare-stage);
+}
+
+/* 重叠模式中央分割线 */
+.overlay-divider {
+  background: var(--theme-a-border);
+  box-shadow:
+    0 0 0 1px var(--theme-shadow),
+    0 0 16px var(--theme-divider-glow);
+}
+
+/* 重叠模式拖动手柄 */
+.overlay-handle {
+  color: #ffffff;
+  border-color: #ffffff;
+  background: var(--theme-a);
+  box-shadow: 0 5px 18px var(--theme-shadow);
+}
+
+.overlay-divider:hover .overlay-handle {
+  background: var(--theme-a-hover);
+}
+
+/* A/B 浮动标签 */
+.overlay-label {
+  color: #ffffff;
+  box-shadow: 0 3px 10px var(--theme-shadow);
+}
+
+.overlay-label-a {
+  background: var(--theme-a-soft);
+}
+
+.overlay-label-b {
+  background: var(--theme-b-soft);
+}
+
+/* 重叠模式底部文件名 */
+.overlay-names {
+  color: var(--theme-text-secondary);
+  border-top-color: var(--theme-border);
+  background: var(--theme-compare-footer);
+}
+
+.overlay-names span:nth-child(2) {
+  color: var(--theme-a);
+}
+
+/* ========================================
+   A/B 独立校准视图
+   ======================================== */
+
+.ab-independent-view {
+  color: var(--theme-text);
+  background: var(--theme-compare-stage);
+}
+
+/* 独立校准顶部工具栏 */
+.ab-independent-toolbar {
+  border-bottom-color: var(--theme-border);
+  background: var(--theme-surface-secondary);
+}
+
+.ab-operation-modes span {
+  color: var(--theme-muted);
+}
+
+/* 工具栏普通按钮 */
+.ab-independent-toolbar button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.ab-independent-toolbar button:hover:not(:disabled) {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+.ab-independent-toolbar button:active:not(:disabled) {
+  background: var(--theme-surface-active);
+}
+
+/* 普通激活按钮 */
+.ab-independent-toolbar button.active {
+  color: #ffffff;
+  border-color: var(--theme-accent-hover);
+  background: var(--theme-accent);
+}
+
+/* 当前操作对象为 A */
+.ab-independent-toolbar button.active.image-a {
+  color: #ffffff;
+  border-color: var(--theme-a-border);
+  background: var(--theme-a);
+}
+
+.ab-independent-toolbar button.active.image-a:hover {
+  background: var(--theme-a-hover);
+}
+
+/* 当前操作对象为 B */
+.ab-independent-toolbar button.active.image-b {
+  color: #ffffff;
+  border-color: var(--theme-b-border);
+  background: var(--theme-b);
+}
+
+.ab-independent-toolbar button.active.image-b:hover {
+  background: var(--theme-b-hover);
+}
+
+/* 禁用状态 */
+.ab-independent-toolbar button:disabled {
+  color: var(--theme-muted);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 缩放百分比 */
+.ab-transform-controls .ab-zoom-value {
+  color: var(--theme-accent);
+}
+
+/* 键盘焦点 */
+.ab-independent-toolbar button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   A/B 独立校准：并排显示
+   ======================================== */
+
+.ab-side-view {
+  background: var(--theme-compare-stage);
+}
+
+.ab-side-panel {
+  background: var(--theme-compare-stage);
+}
+
+/* 图片操作视口 */
+.ab-independent-viewport {
+  background: var(--theme-compare-stage);
+}
+
+/* 并排区域中间分割线
+   ab-side-view 的第二个子元素通常是 compare-divider */
+.ab-side-view > .compare-divider {
+  background: var(--theme-compare-divider);
+}
+
+/* ========================================
+   A/B 独立校准：重叠显示
+   ======================================== */
+
+.ab-overlay-view {
+  background: var(--theme-compare-stage);
+}
+
+.ab-overlay-stage {
+  background: var(--theme-compare-stage);
+}
+
+/* 可拖动分割线 */
+.ab-overlay-divider-line {
+  background: var(--theme-a-border);
+  box-shadow:
+    0 0 0 1px var(--theme-shadow),
+    0 0 16px var(--theme-divider-glow);
+}
+
+/* 分割线中央手柄 */
+.ab-overlay-divider-handle {
+  color: #ffffff;
+  border-color: #ffffff;
+  background: var(--theme-a);
+  box-shadow: 0 5px 18px var(--theme-shadow);
+}
+
+.ab-overlay-divider-control:hover .ab-overlay-divider-handle {
+  background: var(--theme-a-hover);
+}
+
+.ab-overlay-divider-control:active .ab-overlay-divider-handle {
+  background: var(--theme-a-hover);
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+/* 操作提示栏 */
+.ab-independent-help {
+  color: var(--theme-muted);
+  border-top-color: var(--theme-border);
+  background: var(--theme-surface-secondary);
+}
+
+/* ========================================
+   A/B 通用可访问性增强
+   ======================================== */
+
+/* 拖动区域获得键盘焦点时显示轮廓 */
+.overlay-range:focus-visible,
+.ab-overlay-divider-control:focus-visible,
+.ab-independent-viewport:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: -2px;
+}
+
+/* 浅色主题下加强图片边界 */
+:root[data-theme="light"] .compare-image-area img,
+:root[data-theme="light"] .overlay-image,
+:root[data-theme="light"] .ab-independent-viewport img,
+:root[data-theme="light"] .ab-overlay-image {
+  filter: drop-shadow(0 8px 16px var(--theme-image-shadow));
+}
+/* ========================================
+   第四阶段主题适配：网格与多图同步对比
+   ======================================== */
+
+/* 网格和多图对比专用颜色 */
+:root,
+:root[data-theme="dark"] {
+  --theme-grid-card: #181a1f;
+  --theme-grid-image-bg: #111216;
+  --theme-grid-border: #2d3037;
+
+  --theme-multi-toolbar-bg: rgba(23, 25, 30, 0.96);
+  --theme-local-adjust-bg: rgba(91, 85, 220, 0.88);
+  --theme-local-adjust-border: rgba(151, 145, 255, 0.5);
+
+  --theme-badge-bg: rgba(15, 16, 20, 0.76);
+  --theme-badge-border: rgba(255, 255, 255, 0.1);
+  --theme-badge-text: rgba(255, 255, 255, 0.8);
+}
+
+:root[data-theme="gray"] {
+  --theme-grid-card: #35383d;
+  --theme-grid-image-bg: #292b2f;
+  --theme-grid-border: #555a62;
+
+  --theme-multi-toolbar-bg: rgba(48, 51, 56, 0.96);
+  --theme-local-adjust-bg: rgba(104, 98, 223, 0.9);
+  --theme-local-adjust-border: rgba(163, 158, 255, 0.58);
+
+  --theme-badge-bg: rgba(38, 40, 45, 0.84);
+  --theme-badge-border: rgba(255, 255, 255, 0.14);
+  --theme-badge-text: rgba(255, 255, 255, 0.84);
+}
+
+:root[data-theme="light"] {
+  --theme-grid-card: #ffffff;
+  --theme-grid-image-bg: #edf1f6;
+  --theme-grid-border: #d4d9e0;
+
+  --theme-multi-toolbar-bg: rgba(255, 255, 255, 0.96);
+  --theme-local-adjust-bg: rgba(87, 79, 208, 0.92);
+  --theme-local-adjust-border: rgba(87, 79, 208, 0.54);
+
+  --theme-badge-bg: rgba(255, 255, 255, 0.9);
+  --theme-badge-border: rgba(35, 42, 52, 0.16);
+  --theme-badge-text: rgba(32, 36, 42, 0.78);
+}
+
+/* ========================================
+   普通网格视图
+   ======================================== */
+
+.grid-view {
+  color: var(--theme-text);
+  background: transparent;
+}
+
+.grid-card {
+  border-color: var(--theme-grid-border);
+  background: var(--theme-grid-card);
+  box-shadow: 0 3px 12px var(--theme-shadow);
+}
+
+.grid-image-area {
+  background: var(--theme-grid-image-bg);
+}
+
+.grid-card-name {
+  color: var(--theme-text-secondary);
+  border-top-color: var(--theme-grid-border);
+  background: var(--theme-grid-card);
+}
+
+/* 普通网格卡片悬停反馈 */
+.grid-card {
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.grid-card:hover {
+  border-color: var(--theme-accent);
+  box-shadow: 0 6px 20px var(--theme-shadow);
+}
+
+/* ========================================
+   多图同步对比外层
+   ======================================== */
+
+.multi-compare-shell {
+  color: var(--theme-text);
+  background: transparent;
+}
+
+/* 多图同步对比顶部工具栏 */
+.multi-compare-toolbar {
+  border-bottom-color: var(--theme-border);
+  background: var(--theme-multi-toolbar-bg);
+  box-shadow: 0 3px 12px var(--theme-shadow);
+}
+
+.multi-compare-toolbar strong {
+  color: var(--theme-text);
+}
+
+.multi-compare-toolbar span {
+  color: var(--theme-muted);
+}
+
+/* 工具栏控制按钮 */
+.multi-compare-toolbar-actions button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.multi-compare-toolbar-actions button:hover:not(:disabled) {
+  color: var(--theme-text);
+  border-color: var(--theme-accent);
+  background: var(--theme-control-hover);
+}
+
+.multi-compare-toolbar-actions button:active:not(:disabled) {
+  background: var(--theme-surface-active);
+}
+
+.multi-compare-toolbar-actions button:disabled {
+  color: var(--theme-muted);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 多图同步缩放百分比 */
+.multi-compare-toolbar-actions .multi-zoom-value {
+  color: var(--theme-accent);
+}
+
+/* 工具栏键盘焦点 */
+.multi-compare-toolbar-actions button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   多图同步对比卡片
+   ======================================== */
+
+.grid-view.multi-compare-view {
+  color: var(--theme-text);
+  background: transparent;
+}
+
+.multi-compare-card {
+  border-color: var(--theme-grid-border);
+  background: var(--theme-grid-card);
+}
+
+/* 正常状态下的卡片悬停 */
+.multi-compare-card:hover {
+  border-color: var(--theme-accent);
+}
+
+/* 图片操作区域 */
+.multi-compare-image-area {
+  background: var(--theme-grid-image-bg);
+}
+
+/* 使键盘焦点清晰可见 */
+.multi-compare-image-area:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: -2px;
+}
+
+/* ========================================
+   单图独立校准状态
+   ======================================== */
+
+.multi-compare-card.is-local-adjusting {
+  border-color: var(--theme-a-border);
+  box-shadow:
+    0 0 0 1px var(--theme-local-adjust-border),
+    0 8px 28px var(--theme-shadow);
+}
+
+/* 当前正在独立校准的文字标签 */
+.multi-compare-card.is-local-adjusting .multi-compare-image-area::after {
+  color: #ffffff;
+  border-color: var(--theme-local-adjust-border);
+  background: var(--theme-local-adjust-bg);
+  box-shadow: 0 3px 10px var(--theme-shadow);
+}
+
+/* 单张图片自己的缩放比例 */
+.multi-local-zoom {
+  color: var(--theme-badge-text);
+  border-color: var(--theme-badge-border);
+  background: var(--theme-badge-bg);
+  box-shadow: 0 2px 8px var(--theme-shadow);
+}
+
+/* 保持默认比例标签隐藏 */
+.multi-local-zoom.is-default {
+  display: none;
+}
+
+/* ========================================
+   多图操作帮助浮层
+   ======================================== */
+
+.multi-compare-help {
+  color: var(--theme-glass-text);
+  border-color: var(--theme-glass-border);
+  background: var(--theme-glass-bg);
+  box-shadow: 0 6px 20px var(--theme-shadow);
+}
+
+/* ========================================
+   多图数量不足警告
+   ======================================== */
+
+.multi-compare-warning {
+  color: var(--theme-muted);
+  background: transparent;
+}
+
+.multi-compare-warning h2 {
+  color: var(--theme-text);
+}
+
+.multi-compare-warning p {
+  color: var(--theme-muted);
+}
+
+/* 如果警告中包含图标，则跟随主题强调色 */
+.multi-compare-warning svg {
+  color: var(--theme-accent);
+}
+
+/* ========================================
+   浅色主题视觉增强
+   ======================================== */
+
+/* 浅色主题下让图片与浅色卡片保持边界 */
+:root[data-theme="light"] .grid-image-area img,
+:root[data-theme="light"] .multi-compare-image-area img {
+  filter: drop-shadow(0 5px 10px rgba(35, 42, 52, 0.14));
+}
+
+/* 浅色主题下减弱卡片悬停阴影 */
+:root[data-theme="light"] .grid-card {
+  box-shadow: 0 2px 8px rgba(35, 42, 52, 0.1);
+}
+
+:root[data-theme="light"] .grid-card:hover {
+  box-shadow: 0 6px 18px rgba(35, 42, 52, 0.16);
+}
+
+/* 浅色主题下保持校准标签为白字 */
+:root[data-theme="light"]
+  .multi-compare-card.is-local-adjusting
+  .multi-compare-image-area::after {
+  color: #ffffff;
+}
+
+/* ========================================
+   高对比度与交互状态
+   ======================================== */
+
+/* 多图拖动时关闭过渡，避免图片延迟跟随 */
+.canvas.is-multi-panning .multi-compare-image-area img {
+  transition: none;
+}
+
+/* 拖动时维持抓取光标 */
+.canvas.is-multi-panning,
+.canvas.is-multi-panning * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* 禁用按钮不响应悬停颜色 */
+.multi-compare-toolbar-actions button:disabled:hover {
+  color: var(--theme-muted);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+/* ========================================
+   第五阶段：主题收尾、可访问性与响应式优化
+   ======================================== */
+
+/* ========================================
+   页面根节点与原生控件主题
+   ======================================== */
+
+:root,
+:root[data-theme="dark"],
+:root[data-theme="gray"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-width: 0;
+  min-height: 100%;
+  margin: 0;
+  background: var(--theme-surface);
+}
+
+body {
+  color: var(--theme-text);
+  background: var(--theme-surface);
+}
+
+/* 让输入框、下拉框等原生控件继承字体 */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* 文本选中颜色 */
+::selection {
+  color: #ffffff;
+  background: var(--theme-accent);
+}
+
+/* ========================================
+   主题滚动条
+   ======================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-muted) var(--theme-surface-secondary);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--theme-surface-secondary);
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  border: 2px solid var(--theme-surface-secondary);
+  border-radius: 999px;
+  background: var(--theme-muted);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-text-secondary);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--theme-surface-secondary);
+}
+
+/* ========================================
+   全局键盘焦点
+   ======================================== */
+
+:where(
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea,
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+/* 鼠标点击时不额外显示焦点框 */
+:where(
+    button,
+    [role="button"],
+    a,
+    input,
+    select,
+    textarea,
+    [tabindex]
+  ):focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ========================================
+   主题切换过渡
+   ======================================== */
+
+/*
+  仅对主要容器的颜色进行过渡。
+  不对 transform、图片位置和尺寸设置过渡，
+  避免缩放、拖动时产生延迟。
+*/
+body,
+.app,
+.app-shell,
+.sidebar,
+.viewer,
+.viewer-toolbar,
+.canvas,
+.statusbar,
+.compare-view,
+.compare-panel,
+.compare-image-area,
+.overlay-view,
+.overlay-stage,
+.ab-independent-view,
+.ab-independent-toolbar,
+.ab-independent-viewport,
+.ab-side-view,
+.ab-overlay-view,
+.ab-overlay-stage,
+.grid-card,
+.grid-image-area,
+.multi-compare-card,
+.multi-compare-image-area,
+.multi-compare-toolbar,
+.canvas-shortcuts,
+.canvas-tools button,
+.empty-icon {
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+/* 按钮单独保留简短反馈 */
+button {
+  transition:
+    color 0.14s ease,
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    opacity 0.14s ease;
+}
+
+/* 拖动过程中取消可能影响操作反馈的过渡 */
+.canvas.is-panning,
+.canvas.is-panning *,
+.canvas.is-multi-panning,
+.canvas.is-multi-panning *,
+.overlay-divider,
+.ab-overlay-divider-control,
+.ab-independent-viewport,
+.multi-compare-image-area {
+  transition-property: color, background-color, border-color, box-shadow;
+}
+
+/* ========================================
+   减少动画偏好
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   长文件名与文本溢出
+   ======================================== */
+
+.compare-name,
+.overlay-names span,
+.grid-card-name,
+.current-mode,
+.statusbar span,
+.multi-compare-toolbar strong,
+.multi-compare-toolbar span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 文件名较长时通过 title 属性查看完整内容 */
+.compare-name,
+.grid-card-name,
+.overlay-names span {
+  cursor: default;
+}
+
+/* 工具栏子元素允许正确收缩 */
+.viewer-toolbar > *,
+.ab-independent-toolbar > *,
+.multi-compare-toolbar > * {
+  min-width: 0;
+}
+
+/* ========================================
+   主题切换器层级与防遮挡
+   ======================================== */
+
+/*
+  如果项目中的主题切换器类名为 theme-switcher，
+  该规则会确保它显示在普通工具栏上方。
+*/
+.theme-switcher {
+  position: relative;
+  z-index: 30;
+  flex: 0 0 auto;
+}
+
+/* 弹出式主题菜单 */
+.theme-switcher-menu,
+.theme-menu,
+.theme-dropdown {
+  z-index: 1000;
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+  background: var(--theme-surface);
+  box-shadow: 0 10px 32px var(--theme-shadow);
+}
+
+/* 主题菜单项目 */
+.theme-switcher-menu button,
+.theme-menu button,
+.theme-dropdown button {
+  color: var(--theme-text-secondary);
+}
+
+.theme-switcher-menu button:hover,
+.theme-menu button:hover,
+.theme-dropdown button:hover {
+  color: var(--theme-text);
+  background: var(--theme-control-hover);
+}
+
+.theme-switcher-menu button.active,
+.theme-menu button.active,
+.theme-dropdown button.active {
+  color: #ffffff;
+  background: var(--theme-accent);
+}
+
+/* ========================================
+   中等宽度窗口
+   ======================================== */
+
+@media (max-width: 1100px) {
+  .viewer-toolbar,
+  .ab-independent-toolbar,
+  .multi-compare-toolbar {
+    gap: 8px;
+  }
+
+  .ab-operation-modes,
+  .ab-transform-controls,
+  .multi-compare-toolbar-actions {
+    gap: 6px;
+  }
+
+  .viewer-toolbar button,
+  .ab-independent-toolbar button,
+  .multi-compare-toolbar-actions button {
+    min-width: 32px;
+  }
+
+  .canvas-shortcuts,
+  .multi-compare-help {
+    max-width: calc(100% - 32px);
+  }
+}
+
+/* ========================================
+   平板与窄窗口
+   ======================================== */
+
+@media (max-width: 800px) {
+  .viewer-toolbar,
+  .ab-independent-toolbar,
+  .multi-compare-toolbar {
+    flex-wrap: wrap;
+    align-items: center;
+    height: auto;
+    min-height: 44px;
+  }
+
+  .zoom-controls,
+  .ab-operation-modes,
+  .ab-transform-controls,
+  .multi-compare-toolbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .current-mode {
+    max-width: 160px;
+  }
+
+  .canvas-tools {
+    top: 10px;
+    right: 10px;
+  }
+
+  .canvas-shortcuts {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    justify-content: center;
+  }
+
+  .multi-compare-help {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    text-align: center;
+  }
+
+  .empty-state,
+  .compare-warning,
+  .multi-compare-warning {
+    max-width: calc(100% - 32px);
+    padding: 24px 16px;
+  }
+
+  .empty-tips {
+    justify-content: center;
+  }
+}
+
+.import-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  color: #fff;
+  background: #a33a32;
+}
+
+.import-notice span {
+  min-width: 0;
+}
+
+.import-notice button {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  color: inherit;
+  background: rgb(255 255 255 / 14%);
+  cursor: pointer;
+}
+
+.import-notice button:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.import-notice button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ========================================
+   手机宽度
+   ======================================== */
+
+@media (max-width: 600px) {
+  .viewer-toolbar,
+  .ab-independent-toolbar,
+  .multi-compare-toolbar {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  .statusbar {
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  /* 状态栏内容过多时避免撑破窗口 */
+  .statusbar span {
+    max-width: 50%;
+  }
+
+  .compare-mode-switch {
+    max-width: 100%;
+  }
+
+  .compare-mode-switch button {
+    min-width: 0;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .ab-side-view {
+    /*
+      如果原布局已经在窄屏下切换为上下排列，
+      下面的规则只负责保证宽度不会溢出。
+    */
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .grid-view,
+  .grid-view.multi-compare-view {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .grid-card,
+  .multi-compare-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .canvas-shortcuts {
+    font-size: 11px;
+  }
+
+  .canvas-shortcuts span:not(:last-child)::after {
+    margin-right: 6px;
+    margin-left: 6px;
+  }
+}
+
+/* ========================================
+   触摸设备优化
+   ======================================== */
+
+@media (pointer: coarse) {
+  .zoom-controls button,
+  .canvas-tools button,
+  .compare-mode-switch button,
+  .ab-independent-toolbar button,
+  .multi-compare-toolbar-actions button,
+  .theme-switcher button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* 触摸设备不依赖 hover 表达当前状态 */
+  .grid-card:hover,
+  .multi-compare-card:hover {
+    border-color: var(--theme-grid-border);
+  }
+
+  .grid-card:focus-within,
+  .multi-compare-card:focus-within {
+    border-color: var(--theme-accent);
+  }
+}
+
+/* ========================================
+   系统高对比度模式
+   ======================================== */
+
+@media (forced-colors: active) {
+  button,
+  .grid-card,
+  .multi-compare-card,
+  .empty-icon,
+  .canvas-shortcuts,
+  .multi-compare-help,
+  .multi-local-zoom {
+    border: 1px solid CanvasText;
+  }
+
+  button.active,
+  .compare-mode-switch button.active {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+
+  .overlay-divider,
+  .ab-overlay-divider-line {
+    background: Highlight;
+  }
+}

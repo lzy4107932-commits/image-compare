@@ -1,38 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import logoImage from "./assets/logo.png";
 import type {
   ChangeEvent,
   DragEvent,
   MouseEvent as ReactMouseEvent,
   WheelEvent as ReactWheelEvent,
 } from "react";
-import LanguageSwitch from "./components/LanguageSwitch";
-import ThemeSwitcher from "./components/ThemeSwitcher";
-import { useI18n } from "./i18n";
+import AppHeader from "./components/AppHeader";
+import EmptyState from "./components/EmptyState";
+import ImageSidebar from "./components/ImageSidebar";
+import ImportNotice from "./components/ImportNotice";
+import { useI18n } from "./useI18n";
 import {
-  Columns2,
-  Grid2X2,
+  MAX_IMAGE_COUNT,
+  MAX_IMAGE_FILE_MIB,
+  selectImportableImages,
+} from "./utils/imageImport";
+import {
   Grid3X3,
   Image as ImageIcon,
-  Images,
   Maximize,
-  Trash2,
-  Upload,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import "./App.css";
-type Theme = "dark" | "gray" | "light";
 import MultiCompareView from "./components/MultiCompareView";
 import ABCompareView from "./components/ABCompareView";
-
-type ViewMode = "single" | "compare" | "grid";
-
-type LocalImage = {
-  id: string;
-  name: string;
-  url: string;
-};
+import type { LocalImage, Theme, ViewMode } from "./types";
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -63,6 +56,7 @@ function App() {
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [compareHelp, setCompareHelp] = useState("");
+  const [importNotice, setImportNotice] = useState<string | null>(null);
 
   /*
    * A/BCompareView 内部保存着“同步 / 调整 A / 调整 B”状态，
@@ -249,32 +243,47 @@ function App() {
     }
 
     return images.find((image) => image.id !== compareAImage?.id) ?? null;
-  }, [images, compareAId, compareBId, compareAImage]);
+  }, [images, compareBId, compareAImage]);
 
   function addImageFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList);
 
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const selection = selectImportableImages(files, imagesRef.current.length);
+    const notices: string[] = [];
 
-    if (imageFiles.length === 0) {
+    if (selection.rejectedType > 0) {
+      notices.push(`${t("unsupportedImagesSkipped")}: ${selection.rejectedType}`);
+    }
+
+    if (selection.rejectedSize > 0) {
+      notices.push(
+        `${t("oversizedImagesSkipped")} (${MAX_IMAGE_FILE_MIB} MiB): ${selection.rejectedSize}`,
+      );
+    }
+
+    if (selection.rejectedCount > 0) {
+      notices.push(
+        `${t("imageCountLimitReached")} (${MAX_IMAGE_COUNT}): ${selection.rejectedCount}`,
+      );
+    }
+
+    setImportNotice(notices.length > 0 ? notices.join(" · ") : null);
+
+    if (selection.accepted.length === 0) {
       return;
     }
 
     const currentTime = Date.now();
 
-    const newImages: LocalImage[] = imageFiles.map((file, index) => ({
+    const newImages: LocalImage[] = selection.accepted.map((file, index) => ({
       id: `${currentTime}-${index}-${file.name}`,
       name: file.name,
       url: URL.createObjectURL(file),
     }));
 
-    setImages((currentImages) => {
-      const nextImages = [...currentImages, ...newImages];
-
-      imagesRef.current = nextImages;
-
-      return nextImages;
-    });
+    const nextImages = [...imagesRef.current, ...newImages];
+    imagesRef.current = nextImages;
+    setImages(nextImages);
 
     if (!selectedId && newImages[0]) {
       setSelectedId(newImages[0].id);
@@ -347,13 +356,14 @@ function App() {
   }
 
   function handleDelete(imageId: string) {
-    const target = images.find((image) => image.id === imageId);
+    const currentImages = imagesRef.current;
+    const target = currentImages.find((image) => image.id === imageId);
 
     if (target) {
       URL.revokeObjectURL(target.url);
     }
 
-    const nextImages = images.filter((image) => image.id !== imageId);
+    const nextImages = currentImages.filter((image) => image.id !== imageId);
 
     imagesRef.current = nextImages;
     setImages(nextImages);
@@ -377,6 +387,15 @@ function App() {
     }
   }
 
+  function handleImageLoadError(imageId: string) {
+    if (!imagesRef.current.some((image) => image.id === imageId)) {
+      return;
+    }
+
+    setImportNotice(t("imageLoadFailed"));
+    handleDelete(imageId);
+  }
+
   function handleClear() {
     images.forEach((image) => {
       URL.revokeObjectURL(image.url);
@@ -395,6 +414,7 @@ function App() {
       y: 0,
     });
     setIsPanning(false);
+    setImportNotice(null);
   }
 
   function zoomIn() {
@@ -574,176 +594,32 @@ function App() {
         : gridStatusHelp;
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-icon">
-            <img src={logoImage} alt={`${t("appTitle")} Logo`} />
-          </div>
+      <AppHeader
+        theme={theme}
+        viewMode={viewMode}
+        onThemeChange={setTheme}
+        onViewModeChange={setViewMode}
+        onImport={handleImport}
+        onClear={handleClear}
+      />
 
-          <div>
-            <h1>{t("appTitle")}</h1>
-            <p>{t("appSubtitle")}</p>
-          </div>
-        </div>
-
-        <div className="mode-switch">
-          <button
-            type="button"
-            className={viewMode === "single" ? "active" : ""}
-            onClick={() => setViewMode("single")}
-            title={t("single")}
-            aria-label={t("single")}
-          >
-            <ImageIcon size={18} />
-            <span>{t("single")}</span>
-          </button>
-
-          <button
-            type="button"
-            className={viewMode === "compare" ? "active" : ""}
-            onClick={() => setViewMode("compare")}
-            title={t("compare")}
-            aria-label={t("compare")}
-          >
-            <Columns2 size={18} />
-            <span>{t("compare")}</span>
-          </button>
-
-          <button
-            type="button"
-            className={viewMode === "grid" ? "active" : ""}
-            onClick={() => setViewMode("grid")}
-            title={t("grid")}
-            aria-label={t("grid")}
-          >
-            <Grid2X2 size={18} />
-            <span>{t("grid")}</span>
-          </button>
-        </div>
-
-        <div className="topbar-actions">
-          <ThemeSwitcher theme={theme} onThemeChange={setTheme} />
-
-          <label
-            className="upload-button"
-            title={t("importImages")}
-            aria-label={t("importImages")}
-          >
-            <Upload size={18} />
-            <span>{t("importImages")}</span>
-
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImport}
-            />
-          </label>
-
-          <button
-            type="button"
-            className="clear-button"
-            onClick={handleClear}
-            title={t("clearImages")}
-            aria-label={t("clearImages")}
-          >
-            <Trash2 size={17} />
-            {t("clearImages")}
-          </button>
-          <LanguageSwitch />
-        </div>
-      </header>
+      <ImportNotice
+        message={importNotice}
+        onDismiss={() => setImportNotice(null)}
+      />
 
       <div className="workspace">
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <div>
-              <h2>{t("imageList")}</h2>
-              <span>
-                {images.length} {t("imagesUnit")}
-              </span>
-            </div>
-          </div>
-
-          <div className="image-list">
-            {images.length === 0 ? (
-              <div className="sidebar-empty">
-                <ImageIcon size={32} />
-                <span>{t("noImagesImported")}</span>
-              </div>
-            ) : (
-              images.map((image, index) => {
-                const isImageA = compareAImage?.id === image.id;
-                const isImageB = compareBImage?.id === image.id;
-
-                return (
-                  <div
-                    key={image.id}
-                    className={
-                      selectedImage?.id === image.id
-                        ? "image-item selected"
-                        : "image-item"
-                    }
-                    onClick={() => setSelectedId(image.id)}
-                  >
-                    <img src={image.url} alt={image.name} />
-
-                    <div className="image-item-info">
-                      <strong title={image.name}>{image.name}</strong>
-
-                      <span>
-                        {t("imageNumber")} {index + 1}
-                      </span>
-
-                      <div className="image-role-actions">
-                        <button
-                          className={
-                            isImageA
-                              ? "role-button role-a active"
-                              : "role-button role-a"
-                          }
-                          title="将这张图片设为 A"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setAsImageA(image.id);
-                          }}
-                        >
-                          A
-                        </button>
-
-                        <button
-                          className={
-                            isImageB
-                              ? "role-button role-b active"
-                              : "role-button role-b"
-                          }
-                          title="将这张图片设为 B"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setAsImageB(image.id);
-                          }}
-                        >
-                          B
-                        </button>
-                      </div>
-                    </div>
-
-                    <button
-                      className="delete-image-button"
-                      title={t("delete")}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleDelete(image.id);
-                      }}
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </aside>
+        <ImageSidebar
+          images={images}
+          selectedImageId={selectedImage?.id ?? null}
+          compareAId={compareAImage?.id ?? null}
+          compareBId={compareBImage?.id ?? null}
+          onSelect={setSelectedId}
+          onSetAsA={setAsImageA}
+          onSetAsB={setAsImageB}
+          onDelete={handleDelete}
+          onImageLoadError={handleImageLoadError}
+        />
 
         <main className="viewer">
           <div className="viewer-toolbar">
@@ -856,13 +732,7 @@ function App() {
             }}
           >
             {images.length === 0 ? (
-              <EmptyState
-                title={t("startImport")}
-                description={t("importDescription")}
-                singleText={t("single")}
-                compareText={t("compare")}
-                gridText={t("grid")}
-              />
+              <EmptyState />
             ) : (
               <>
                 {viewMode === "single" && selectedImage && (
@@ -914,39 +784,6 @@ function App() {
             </span>
           </footer>
         </main>
-      </div>
-    </div>
-  );
-}
-
-type EmptyStateProps = {
-  title: string;
-  description: string;
-  singleText: string;
-  compareText: string;
-  gridText: string;
-};
-
-function EmptyState({
-  title,
-  description,
-  singleText,
-  compareText,
-  gridText,
-}: EmptyStateProps) {
-  return (
-    <div className="empty-state">
-      <div className="empty-icon">
-        <Images size={48} />
-      </div>
-
-      <h2>{title}</h2>
-      <p>{description}</p>
-
-      <div className="empty-tips">
-        <span>{singleText}</span>
-        <span>{compareText}</span>
-        <span>{gridText}</span>
       </div>
     </div>
   );

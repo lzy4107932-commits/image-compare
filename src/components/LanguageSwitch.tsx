@@ -1,5 +1,5 @@
 import { Languages } from "lucide-react";
-import { useI18n } from "../i18n";
+import { useI18n } from "../useI18n";
 
 export default function LanguageSwitch() {
   const { language, toggleLanguage, t } = useI18n();

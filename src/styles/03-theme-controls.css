@@ -1,0 +1,529 @@
+/* =========================
+   主题下拉菜单
+   ========================= */
+
+.theme-dropdown {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  overflow: visible;
+}
+
+.theme-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-width: 96px;
+  height: 42px;
+  padding: 0 13px;
+
+  color: var(--text-primary, #4b5563);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border-color, #d5dbe5);
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.theme-dropdown-trigger:hover {
+  color: var(--primary-color, #4775df);
+  background: var(--surface-hover, #f5f7fb);
+  border-color: var(--primary-color, #4775df);
+}
+
+.theme-dropdown-trigger:focus-visible {
+  outline: 2px solid var(--primary-color, #4775df);
+  outline-offset: 2px;
+}
+
+.theme-dropdown-trigger .is-open {
+  transform: rotate(180deg);
+}
+
+.theme-dropdown-trigger svg:last-child {
+  transition: transform 0.18s ease;
+}
+
+/* 纵向下拉菜单 */
+.theme-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  width: 160px;
+  padding: 6px;
+
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border-color, #d5dbe5);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 30px rgb(15 23 42 / 16%),
+    0 3px 8px rgb(15 23 42 / 10%);
+}
+
+.theme-dropdown-option {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: 22px 1fr 20px;
+  align-items: center;
+  gap: 9px;
+
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+
+  color: var(--text-primary, #374151);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.theme-dropdown-option:hover {
+  background: var(--surface-hover, #f1f5f9);
+}
+
+.theme-dropdown-option.is-active {
+  color: var(--primary-color, #4775df);
+  background: rgb(71 117 223 / 12%);
+  font-weight: 600;
+}
+
+.theme-dropdown-check {
+  justify-self: end;
+  color: var(--primary-color, #4775df);
+}
+/* ==================================================
+   顶部右侧：主题下拉按钮
+   ================================================== */
+
+/* 默认按浅色主题处理 */
+.theme-dropdown {
+  --theme-button-bg: #ffffff;
+  --theme-button-hover-bg: #f4f6fa;
+  --theme-button-text: #4b5563;
+  --theme-button-border: #d2d8e2;
+  --theme-menu-bg: #ffffff;
+  --theme-menu-hover: #f1f4f9;
+  --theme-menu-shadow: rgb(15 23 42 / 18%);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+/* 深色主题 */
+[data-theme="dark"] .theme-dropdown {
+  --theme-button-bg: #22252c;
+  --theme-button-hover-bg: #2b2f38;
+  --theme-button-text: #d7dce6;
+  --theme-button-border: #3b414d;
+  --theme-menu-bg: #22252c;
+  --theme-menu-hover: #303540;
+  --theme-menu-shadow: rgb(0 0 0 / 45%);
+}
+
+/* 灰色主题 */
+[data-theme="gray"] .theme-dropdown {
+  --theme-button-bg: #e7e9ed;
+  --theme-button-hover-bg: #dce0e6;
+  --theme-button-text: #454b55;
+  --theme-button-border: #c4cad3;
+  --theme-menu-bg: #e7e9ed;
+  --theme-menu-hover: #d9dde4;
+  --theme-menu-shadow: rgb(31 41 55 / 20%);
+}
+
+/* 浅色主题 */
+[data-theme="light"] .theme-dropdown {
+  --theme-button-bg: #ffffff;
+  --theme-button-hover-bg: #f4f6fa;
+  --theme-button-text: #4b5563;
+  --theme-button-border: #d2d8e2;
+  --theme-menu-bg: #ffffff;
+  --theme-menu-hover: #f1f4f9;
+  --theme-menu-shadow: rgb(15 23 42 / 18%);
+}
+
+/* 缩小后的主题按钮 */
+.theme-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  width: auto;
+  min-width: 78px;
+  height: 34px;
+  padding: 0 9px;
+
+  color: var(--theme-button-text);
+  background: var(--theme-button-bg);
+  border: 1px solid var(--theme-button-border);
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.theme-dropdown-trigger:hover {
+  color: #5d8cff;
+  background: var(--theme-button-hover-bg);
+  border-color: #5d8cff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 14%);
+}
+
+.theme-dropdown-trigger:active {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 14%);
+}
+
+.theme-dropdown-trigger:focus-visible {
+  outline: 2px solid #5d8cff;
+  outline-offset: 2px;
+}
+
+.theme-dropdown-trigger svg {
+  flex: 0 0 auto;
+}
+
+/* 下拉箭头动画 */
+.theme-dropdown-trigger svg:last-child {
+  transition: transform 0.16s ease;
+}
+
+.theme-dropdown-trigger svg:last-child.is-open {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单也跟随主题 */
+.theme-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  width: 132px;
+  padding: 5px;
+
+  color: var(--theme-button-text);
+  background: var(--theme-menu-bg);
+  border: 1px solid var(--theme-button-border);
+  border-radius: 9px;
+  box-shadow:
+    0 12px 28px var(--theme-menu-shadow),
+    0 2px 6px rgb(0 0 0 / 12%);
+}
+
+.theme-dropdown-option {
+  display: grid;
+  grid-template-columns: 19px 1fr 18px;
+  align-items: center;
+  gap: 7px;
+
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+
+  color: var(--theme-button-text);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.theme-dropdown-option:hover {
+  background: var(--theme-menu-hover);
+}
+
+.theme-dropdown-option.is-active {
+  color: #6c96ff;
+  background: rgb(91 140 255 / 15%);
+  font-weight: 600;
+}
+
+.theme-dropdown-check {
+  justify-self: end;
+  color: #6c96ff;
+}
+/* ==================================================
+   顶部右侧：导入图片按钮
+   ================================================== */
+
+.topbar-actions > .upload-button {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  width: auto;
+  min-width: 116px;
+  height: 38px;
+  padding: 0 14px;
+  box-sizing: border-box;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #668fff 0%, #4776e6 100%);
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 9px;
+
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    0 4px 10px rgb(54 103 220 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 20%);
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+.topbar-actions > .upload-button:hover {
+  color: #ffffff;
+  background: linear-gradient(135deg, #739aff 0%, #5682eb 100%);
+  border-color: rgb(255 255 255 / 28%);
+  box-shadow:
+    0 6px 15px rgb(54 103 220 / 30%),
+    inset 0 1px 0 rgb(255 255 255 / 24%);
+  transform: translateY(-1px);
+}
+
+.topbar-actions > .upload-button:active {
+  background: linear-gradient(135deg, #527ee9 0%, #3e6bd8 100%);
+  box-shadow:
+    0 2px 5px rgb(54 103 220 / 24%),
+    inset 0 1px 2px rgb(0 0 0 / 12%);
+  transform: translateY(0);
+}
+
+.topbar-actions > .upload-button:focus-within {
+  outline: 2px solid rgb(99 145 255 / 55%);
+  outline-offset: 2px;
+}
+
+.topbar-actions > .upload-button svg {
+  flex: 0 0 auto;
+  stroke-width: 2;
+}
+
+/* 隐藏真正的文件输入框 */
+.topbar-actions > .upload-button input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* ==================================================
+   修复：灰色主题下拉菜单使用深灰色
+   必须放在 App.css 最后
+   ================================================== */
+
+/* 同时兼容 data-theme 位于 html 和组件自身两种情况 */
+:root[data-theme="gray"] .theme-dropdown,
+.theme-dropdown[data-theme="gray"] {
+  --theme-menu-bg: #35383d;
+  --theme-menu-hover: #45494f;
+  --theme-menu-text: #f0f1f2;
+  --theme-menu-border: #555a62;
+  --theme-menu-active-bg: rgba(91, 145, 232, 0.2);
+  --theme-menu-active-text: #82adf3;
+  --theme-menu-shadow: rgba(0, 0, 0, 0.32);
+}
+
+/* 灰色主题菜单容器 */
+:root[data-theme="gray"] .theme-dropdown-menu,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-menu {
+  color: var(--theme-menu-text) !important;
+  background: var(--theme-menu-bg) !important;
+  border-color: var(--theme-menu-border) !important;
+  box-shadow:
+    0 12px 28px var(--theme-menu-shadow),
+    0 2px 6px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* 灰色主题菜单普通选项 */
+:root[data-theme="gray"] .theme-dropdown-option,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-option {
+  color: var(--theme-menu-text) !important;
+  background: transparent !important;
+}
+
+/* 鼠标悬停 */
+:root[data-theme="gray"] .theme-dropdown-option:hover,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-option:hover {
+  color: #ffffff !important;
+  background: var(--theme-menu-hover) !important;
+}
+
+/* 当前选中的主题 */
+:root[data-theme="gray"] .theme-dropdown-option.is-active,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-option.is-active {
+  color: var(--theme-menu-active-text) !important;
+  background: var(--theme-menu-active-bg) !important;
+  font-weight: 600;
+}
+
+/* 当前选项右侧对勾 */
+:root[data-theme="gray"] .theme-dropdown-check,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-check {
+  color: var(--theme-menu-active-text) !important;
+}
+/* ==================================================
+   修复：灰色主题切换按钮使用灰色主题色
+   放在 App.css 最后
+   ================================================== */
+
+:root[data-theme="gray"] .topbar-actions .theme-dropdown-trigger,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-trigger {
+  color: #c4c7cc !important;
+  background: #35383d !important;
+  border-color: #555a62 !important;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 鼠标悬停 */
+:root[data-theme="gray"] .topbar-actions .theme-dropdown-trigger:hover,
+.theme-dropdown[data-theme="gray"] .theme-dropdown-trigger:hover {
+  color: #ffffff !important;
+  background: #45494f !important;
+  border-color: #74a4ef !important;
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 下拉菜单打开时 */
+:root[data-theme="gray"]
+  .topbar-actions
+  .theme-dropdown-trigger[aria-expanded="true"],
+.theme-dropdown[data-theme="gray"]
+  .theme-dropdown-trigger[aria-expanded="true"] {
+  color: #ffffff !important;
+  background: #40444b !important;
+  border-color: #5b91e8 !important;
+}
+/* 灰色主题：修复主题按钮和菜单仍为浅色 */
+:root[data-theme="gray"] .theme-dropdown {
+  --theme-button-bg: var(--theme-surface);
+  --theme-button-hover-bg: var(--theme-surface-hover);
+  --theme-button-text: var(--theme-text-secondary);
+  --theme-button-border: var(--theme-border);
+
+  --theme-menu-bg: var(--theme-surface);
+  --theme-menu-hover: var(--theme-surface-hover);
+  --theme-menu-shadow: rgb(0 0 0 / 32%);
+}
+
+/* 直接覆盖主题按钮，避免前面的通用按钮规则影响 */
+:root[data-theme="gray"] .theme-dropdown-trigger {
+  color: var(--theme-text-secondary) !important;
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* 鼠标悬停 */
+:root[data-theme="gray"] .theme-dropdown-trigger:hover {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-surface-hover) !important;
+  border-color: var(--theme-accent) !important;
+}
+
+/* 菜单打开状态 */
+:root[data-theme="gray"] .theme-dropdown-trigger[aria-expanded="true"] {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-surface-active) !important;
+  border-color: var(--theme-accent) !important;
+}
+
+/* 灰色主题下拉菜单 */
+:root[data-theme="gray"] .theme-dropdown-menu {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* 菜单普通项目 */
+:root[data-theme="gray"] .theme-dropdown-option {
+  color: var(--theme-text-secondary) !important;
+  background-color: transparent !important;
+}
+
+/* 菜单项目悬停 */
+:root[data-theme="gray"] .theme-dropdown-option:hover {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-surface-hover) !important;
+}
+
+/* 当前选中的主题 */
+:root[data-theme="gray"] .theme-dropdown-option.is-active {
+  color: var(--theme-accent-hover) !important;
+  background-color: rgb(91 145 232 / 18%) !important;
+}

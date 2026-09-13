@@ -1,22 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type SetStateAction,
+} from "react";
 import { createPortal } from "react-dom";
 import { Columns2, Layers3, Minus, Plus, RotateCcw } from "lucide-react";
-import { useI18n } from "../i18n";
+import { useI18n } from "../useI18n";
+import type { LocalImage } from "../types";
+import {
+  clampZoom,
+  composeTransforms,
+  DEFAULT_TRANSFORM,
+  type TransformState,
+  zoomAtPoint,
+} from "../utils/imageTransforms";
 
 type CompareMode = "side" | "overlay";
 type OperationMode = "sync" | "a" | "b";
-
-type CompareImage = {
-  id: string;
-  name: string;
-  url: string;
-};
-
-type TransformState = {
-  zoom: number;
-  x: number;
-  y: number;
-};
 
 type DragState = {
   pointerId: number;
@@ -32,21 +34,16 @@ type DividerDragState = {
   stage: HTMLElement;
 };
 
+type ImageTransformState = {
+  imageId: string | null;
+  transform: TransformState;
+};
+
 type Props = {
-  imageA: CompareImage | null;
-  imageB: CompareImage | null;
+  imageA: LocalImage | null;
+  imageB: LocalImage | null;
   onHelpChange?: (help: string) => void;
 };
-
-const DEFAULT_TRANSFORM: TransformState = {
-  zoom: 100,
-  x: 0,
-  y: 0,
-};
-
-function clampZoom(value: number) {
-  return Math.min(500, Math.max(10, value));
-}
 
 export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
   const { t } = useI18n();
@@ -68,11 +65,69 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
   const [globalTransform, setGlobalTransform] =
     useState<TransformState>(DEFAULT_TRANSFORM);
 
-  const [transformA, setTransformA] =
-    useState<TransformState>(DEFAULT_TRANSFORM);
+  const [transformAState, setTransformAState] = useState<ImageTransformState>(
+    () => ({
+      imageId: imageA?.id ?? null,
+      transform: DEFAULT_TRANSFORM,
+    }),
+  );
 
-  const [transformB, setTransformB] =
-    useState<TransformState>(DEFAULT_TRANSFORM);
+  const [transformBState, setTransformBState] = useState<ImageTransformState>(
+    () => ({
+      imageId: imageB?.id ?? null,
+      transform: DEFAULT_TRANSFORM,
+    }),
+  );
+
+  const transformA =
+    transformAState.imageId === (imageA?.id ?? null)
+      ? transformAState.transform
+      : DEFAULT_TRANSFORM;
+
+  const transformB =
+    transformBState.imageId === (imageB?.id ?? null)
+      ? transformBState.transform
+      : DEFAULT_TRANSFORM;
+
+  const setTransformA = useCallback(
+    (action: SetStateAction<TransformState>) => {
+      const imageId = imageA?.id ?? null;
+
+      setTransformAState((currentState) => {
+        const currentTransform =
+          currentState.imageId === imageId
+            ? currentState.transform
+            : DEFAULT_TRANSFORM;
+
+        return {
+          imageId,
+          transform:
+            typeof action === "function" ? action(currentTransform) : action,
+        };
+      });
+    },
+    [imageA?.id],
+  );
+
+  const setTransformB = useCallback(
+    (action: SetStateAction<TransformState>) => {
+      const imageId = imageB?.id ?? null;
+
+      setTransformBState((currentState) => {
+        const currentTransform =
+          currentState.imageId === imageId
+            ? currentState.transform
+            : DEFAULT_TRANSFORM;
+
+        return {
+          imageId,
+          transform:
+            typeof action === "function" ? action(currentTransform) : action,
+        };
+      });
+    },
+    [imageB?.id],
+  );
 
   const [isPanning, setIsPanning] = useState(false);
   useEffect(() => {
@@ -93,17 +148,6 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
     onHelpChange?.(help);
   }, [operationMode, onHelpChange, t]);
 
-  /*
-   * 更换 A 或 B 图片时，清除对应图片的旧校准。
-   */
-  useEffect(() => {
-    setTransformA(DEFAULT_TRANSFORM);
-  }, [imageA?.id]);
-
-  useEffect(() => {
-    setTransformB(DEFAULT_TRANSFORM);
-  }, [imageB?.id]);
-
   function getOperationTransform() {
     if (operationMode === "a") {
       return transformA;
@@ -116,21 +160,22 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
     return globalTransform;
   }
 
-  function updateOperationTransform(
-    updater: (current: TransformState) => TransformState,
-  ) {
-    if (operationMode === "a") {
-      setTransformA(updater);
-      return;
-    }
+  const updateOperationTransform = useCallback(
+    (updater: (current: TransformState) => TransformState) => {
+      if (operationMode === "a") {
+        setTransformA(updater);
+        return;
+      }
 
-    if (operationMode === "b") {
-      setTransformB(updater);
-      return;
-    }
+      if (operationMode === "b") {
+        setTransformB(updater);
+        return;
+      }
 
-    setGlobalTransform(updater);
-  }
+      setGlobalTransform(updater);
+    },
+    [operationMode, setTransformA, setTransformB],
+  );
 
   /*
    * 当前图片的最终显示状态：
@@ -139,15 +184,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
    * 最终位置 = 同步位置 + 单图校准位置 × 同步缩放
    */
   function getFinalTransform(localTransform: TransformState) {
-    const globalScale = globalTransform.zoom / 100;
-
-    return {
-      zoom: (globalTransform.zoom * localTransform.zoom) / 10000,
-
-      x: globalTransform.x + localTransform.x * globalScale,
-
-      y: globalTransform.y + localTransform.y * globalScale,
-    };
+    return composeTransforms(globalTransform, localTransform);
   }
 
   const finalTransformA = getFinalTransform(transformA);
@@ -197,13 +234,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
           return current;
         }
 
-        const scaleRatio = nextZoom / current.zoom;
-
-        return {
-          zoom: nextZoom,
-          x: pointerX - (pointerX - current.x) * scaleRatio,
-          y: pointerY - (pointerY - current.y) * scaleRatio,
-        };
+        return zoomAtPoint(current, nextZoom, pointerX, pointerY);
       });
     }
 
@@ -214,7 +245,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
     return () => {
       root.removeEventListener("wheel", handleWheel);
     };
-  }, [operationMode]);
+  }, [updateOperationTransform]);
 
   function changeCurrentZoom(step: number) {
     updateOperationTransform((current) => ({
@@ -376,9 +407,9 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
       <div className="compare-warning">
         <Columns2 size={46} />
 
-        <h2>至少需要两张图片</h2>
+        <h2>{t("needTwoImages")}</h2>
 
-        <p>请导入至少两张图片，然后在左侧分别设置 A 和 B。</p>
+        <p>{t("needTwoImagesDescription")}</p>
       </div>
     );
   }

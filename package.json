@@ -8,6 +8,12 @@
     "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron .\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run lint && npm run test && npm run build",
+    "check:all": "npm run check && npm run smoke:electron",
+    "smoke:electron": "node scripts/electron-smoke.cjs",
+    "smoke:packaged": "node scripts/electron-smoke.cjs --packaged",
     "preview": "vite preview",
     "electron:build": "npm run build && electron-builder"
   },
@@ -29,6 +35,7 @@
     "sharp": "^0.35.4",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
+    "vitest": "5.0.0",
     "wait-on": "^9.1.0"
   },
   "allowScripts": {

@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Grid3X3, Minus, Plus, RotateCcw } from "lucide-react";
-import { useI18n } from "../i18n";
-
-type MultiImage = {
-  id: string;
-  name: string;
-  url: string;
-};
-
-type TransformState = {
-  zoom: number;
-  x: number;
-  y: number;
-};
+import { useI18n } from "../useI18n";
+import type { LocalImage } from "../types";
+import {
+  clampZoom,
+  composeTransforms,
+  DEFAULT_TRANSFORM,
+  type TransformState,
+  zoomAtPoint,
+} from "../utils/imageTransforms";
 
 type DragState = {
   imageId: string;
@@ -26,18 +22,8 @@ type DragState = {
 };
 
 type Props = {
-  images: MultiImage[];
+  images: LocalImage[];
 };
-
-const DEFAULT_TRANSFORM: TransformState = {
-  zoom: 100,
-  x: 0,
-  y: 0,
-};
-
-function clampZoom(value: number) {
-  return Math.min(500, Math.max(10, value));
-}
 
 export default function MultiCompareView({ images }: Props) {
   const { t } = useI18n();
@@ -60,23 +46,6 @@ export default function MultiCompareView({ images }: Props) {
   function getLocalTransform(imageId: string) {
     return localTransforms[imageId] ?? DEFAULT_TRANSFORM;
   }
-
-  /*
-   * 删除图片后，同时移除这张图片遗留的校准数据。
-   */
-  useEffect(() => {
-    const currentImageIds = new Set(images.map((image) => image.id));
-
-    setLocalTransforms((currentTransforms) => {
-      const nextTransforms = Object.fromEntries(
-        Object.entries(currentTransforms).filter(([imageId]) =>
-          currentImageIds.has(imageId),
-        ),
-      );
-
-      return nextTransforms;
-    });
-  }, [images]);
 
   /*
    * 使用原生非被动 wheel 监听器：
@@ -143,15 +112,9 @@ export default function MultiCompareView({ images }: Props) {
             return currentTransforms;
           }
 
-          const scaleRatio = nextZoom / current.zoom;
-
           return {
             ...currentTransforms,
-            [imageId]: {
-              zoom: nextZoom,
-              x: pointerX - (pointerX - current.x) * scaleRatio,
-              y: pointerY - (pointerY - current.y) * scaleRatio,
-            },
+            [imageId]: zoomAtPoint(current, nextZoom, pointerX, pointerY),
           };
         });
 
@@ -165,13 +128,7 @@ export default function MultiCompareView({ images }: Props) {
           return current;
         }
 
-        const scaleRatio = nextZoom / current.zoom;
-
-        return {
-          zoom: nextZoom,
-          x: pointerX - (pointerX - current.x) * scaleRatio,
-          y: pointerY - (pointerY - current.y) * scaleRatio,
-        };
+        return zoomAtPoint(current, nextZoom, pointerX, pointerY);
       });
     }
 
@@ -404,16 +361,7 @@ export default function MultiCompareView({ images }: Props) {
           {images.map((image) => {
             const local = getLocalTransform(image.id);
 
-            const globalScale = globalTransform.zoom / 100;
-
-            const finalScale = (globalTransform.zoom * local.zoom) / 10000;
-
-            /*
-             * 单图校准位置会在全局缩放时一起按比例变化。
-             */
-            const finalX = globalTransform.x + local.x * globalScale;
-
-            const finalY = globalTransform.y + local.y * globalScale;
+            const finalTransform = composeTransforms(globalTransform, local);
 
             const hasLocalAdjustment =
               local.zoom !== 100 || local.x !== 0 || local.y !== 0;
@@ -448,7 +396,7 @@ export default function MultiCompareView({ images }: Props) {
                     alt={image.name}
                     draggable={false}
                     style={{
-                      transform: `translate(${finalX}px, ${finalY}px) scale(${finalScale})`,
+                      transform: `translate(${finalTransform.x}px, ${finalTransform.y}px) scale(${finalTransform.zoom})`,
                     }}
                   />
 
@@ -459,7 +407,7 @@ export default function MultiCompareView({ images }: Props) {
                         : "multi-local-zoom is-default"
                     }
                   >
-                    单图 {local.zoom}%
+                    {t("singleImageZoom")} {local.zoom}%
                   </span>
                 </div>
 

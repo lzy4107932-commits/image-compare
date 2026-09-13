@@ -1,11 +1,11 @@
 import {
-  createContext,
-  useContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { I18nContext, type I18nContextValue } from "./i18nContext";
 
 export type Language = "zh" | "en";
 
@@ -109,6 +109,18 @@ const translations = {
     multiCompareMinImages: "多图同步对比至少需要 3 张图片",
     splitPosition: "分割位置",
     rotateClockwise: "顺时针旋转",
+    setAsImageA: "设为图片 A",
+    setAsImageB: "设为图片 B",
+    needTwoImagesDescription: "请导入至少两张图片，然后在左侧分别设置 A 和 B。",
+    singleImageZoom: "单图缩放",
+    unsupportedImagesSkipped: "已跳过不支持的文件",
+    oversizedImagesSkipped: "已跳过超过大小限制的图片",
+    imageCountLimitReached: "图片数量已达到上限",
+    imageLoadFailed: "图片无法解码，已从列表中移除",
+    dismissNotice: "关闭提示",
+    selectTheme: "选择主题",
+    themeSelection: "主题选择",
+    currentTheme: "当前主题",
 
     "theme.dark": "深色",
     "theme.gray": "灰色",
@@ -215,6 +227,19 @@ const translations = {
       "Synchronized multi-image comparison requires at least 3 images",
     splitPosition: "Split position",
     rotateClockwise: "Rotate clockwise",
+    setAsImageA: "Set as image A",
+    setAsImageB: "Set as image B",
+    needTwoImagesDescription:
+      "Import at least two images, then assign A and B from the sidebar.",
+    singleImageZoom: "Single image zoom",
+    unsupportedImagesSkipped: "Unsupported files were skipped",
+    oversizedImagesSkipped: "Images over the size limit were skipped",
+    imageCountLimitReached: "The image count limit has been reached",
+    imageLoadFailed: "The image could not be decoded and was removed",
+    dismissNotice: "Dismiss notice",
+    selectTheme: "Select theme",
+    themeSelection: "Theme selection",
+    currentTheme: "Current theme",
 
     "theme.dark": "Dark",
     "theme.gray": "Gray",
@@ -223,15 +248,6 @@ const translations = {
 } as const;
 
 export type TranslationKey = keyof typeof translations.zh;
-
-type I18nContextValue = {
-  language: Language;
-  setLanguage: (language: Language) => void;
-  toggleLanguage: () => void;
-  t: (key: TranslationKey) => string;
-};
-
-const I18nContext = createContext<I18nContextValue | null>(null);
 
 function getInitialLanguage(): Language {
   const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
@@ -246,14 +262,18 @@ function getInitialLanguage(): Language {
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(getInitialLanguage);
 
-  const setLanguage = (nextLanguage: Language) => {
+  const setLanguage = useCallback((nextLanguage: Language) => {
     setLanguageState(nextLanguage);
     localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
-  };
+  }, []);
 
-  const toggleLanguage = () => {
-    setLanguage(language === "zh" ? "en" : "zh");
-  };
+  const toggleLanguage = useCallback(() => {
+    setLanguageState((currentLanguage) => {
+      const nextLanguage = currentLanguage === "zh" ? "en" : "zh";
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
+      return nextLanguage;
+    });
+  }, []);
 
   const value = useMemo<I18nContextValue>(
     () => ({
@@ -262,7 +282,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       toggleLanguage,
       t: (key) => translations[language][key],
     }),
-    [language],
+    [language, setLanguage, toggleLanguage],
   );
 
   useEffect(() => {
@@ -270,14 +290,4 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
-}
-
-export function useI18n() {
-  const context = useContext(I18nContext);
-
-  if (!context) {
-    throw new Error("useI18n must be used inside I18nProvider");
-  }
-
-  return context;
 }

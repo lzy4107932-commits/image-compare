@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, CloudSun, Moon, Sun } from "lucide-react";
-import { useI18n } from "../i18n";
+import { useI18n } from "../useI18n";
 
 type Theme = "dark" | "gray" | "light";
 
@@ -78,8 +78,8 @@ export default function ThemeSwitcher({
         onClick={() => setIsOpen((open) => !open)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label="选择主题"
-        title={`当前主题：${t(currentOption.labelKey)}`}
+        aria-label={t("selectTheme")}
+        title={`${t("currentTheme")}: ${t(currentOption.labelKey)}`}
       >
         <CurrentIcon size={19} aria-hidden="true" />
 
@@ -93,7 +93,11 @@ export default function ThemeSwitcher({
       </button>
 
       {isOpen && (
-        <div className="theme-dropdown-menu" role="menu" aria-label="主题选择">
+        <div
+          className="theme-dropdown-menu"
+          role="menu"
+          aria-label={t("themeSelection")}
+        >
           {themeOptions.map((option) => {
             const OptionIcon = option.icon;
             const isActive = option.value === theme;
