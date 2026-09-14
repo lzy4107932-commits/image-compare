@@ -29,7 +29,19 @@ export function useImageLibrary() {
   );
   const [importNotice, setImportNotice] = useState<string | null>(null);
   const previousOrderRef = useRef<string[] | null>(null);
+  const importOrderRef = useRef<string[]>([]);
   const [canUndoReorder, setCanUndoReorder] = useState(false);
+  const [canRestoreImportOrder, setCanRestoreImportOrder] = useState(false);
+
+  const updateCanRestoreImportOrder = useCallback(() => {
+    const currentOrder = stateRef.current.images.map((image) => image.id);
+    const importOrder = importOrderRef.current;
+
+    setCanRestoreImportOrder(
+      currentOrder.length === importOrder.length &&
+        currentOrder.some((imageId, index) => imageId !== importOrder[index]),
+    );
+  }, []);
 
   const applyAction = useCallback((action: ImageLibraryAction) => {
     const nextState = imageLibraryReducer(stateRef.current, action);
@@ -43,6 +55,8 @@ export function useImageLibrary() {
         URL.revokeObjectURL(image.url);
       });
       stateRef.current = INITIAL_IMAGE_LIBRARY_STATE;
+      importOrderRef.current = [];
+      previousOrderRef.current = null;
     };
   }, []);
 
@@ -95,9 +109,11 @@ export function useImageLibrary() {
 
       previousOrderRef.current = null;
       setCanUndoReorder(false);
+      importOrderRef.current.push(...images.map((image) => image.id));
       applyAction({ type: "add", images });
+      updateCanRestoreImportOrder();
     },
-    [applyAction, t],
+    [applyAction, t, updateCanRestoreImportOrder],
   );
 
   const selectImage = useCallback(
@@ -135,8 +151,9 @@ export function useImageLibrary() {
       previousOrderRef.current = currentImages.map((image) => image.id);
       setCanUndoReorder(true);
       applyAction({ type: "reorder", imageId, toIndex });
+      updateCanRestoreImportOrder();
     },
-    [applyAction],
+    [applyAction, updateCanRestoreImportOrder],
   );
   const undoReorder = useCallback(() => {
     const imageIds = previousOrderRef.current;
@@ -148,7 +165,21 @@ export function useImageLibrary() {
     applyAction({ type: "restore-order", imageIds });
     previousOrderRef.current = null;
     setCanUndoReorder(false);
-  }, [applyAction]);
+    updateCanRestoreImportOrder();
+  }, [applyAction, updateCanRestoreImportOrder]);
+  const restoreImportOrder = useCallback(() => {
+    if (!canRestoreImportOrder) {
+      return;
+    }
+
+    previousOrderRef.current = stateRef.current.images.map((image) => image.id);
+    setCanUndoReorder(true);
+    applyAction({
+      type: "restore-order",
+      imageIds: importOrderRef.current,
+    });
+    updateCanRestoreImportOrder();
+  }, [applyAction, canRestoreImportOrder, updateCanRestoreImportOrder]);
 
   const deleteImage = useCallback(
     (imageId: string) => {
@@ -162,10 +193,14 @@ export function useImageLibrary() {
 
       previousOrderRef.current = null;
       setCanUndoReorder(false);
+      importOrderRef.current = importOrderRef.current.filter(
+        (currentId) => currentId !== imageId,
+      );
       URL.revokeObjectURL(target.url);
       applyAction({ type: "delete", imageId });
+      updateCanRestoreImportOrder();
     },
-    [applyAction],
+    [applyAction, updateCanRestoreImportOrder],
   );
 
   const handleImageLoadError = useCallback(
@@ -186,7 +221,9 @@ export function useImageLibrary() {
     });
     applyAction({ type: "clear" });
     previousOrderRef.current = null;
+    importOrderRef.current = [];
     setCanUndoReorder(false);
+    setCanRestoreImportOrder(false);
     setImportNotice(null);
   }, [applyAction]);
 
@@ -204,6 +241,8 @@ export function useImageLibrary() {
     reorderImage,
     undoReorder,
     canUndoReorder,
+    restoreImportOrder,
+    canRestoreImportOrder,
     deleteImage,
     handleImageLoadError,
     clearImages,

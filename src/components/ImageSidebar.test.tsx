@@ -24,6 +24,8 @@ function renderSidebar(overrides: Partial<Parameters<typeof ImageSidebar>[0]> = 
     onReorder: vi.fn(),
     onUndoReorder: vi.fn(),
     canUndoReorder: false,
+    onRestoreImportOrder: vi.fn(),
+    canRestoreImportOrder: false,
     onDelete: vi.fn(),
     onImageLoadError: vi.fn(),
     ...overrides,
@@ -96,6 +98,20 @@ describe("ImageSidebar", () => {
     expect(props.onUndoReorder).toHaveBeenCalledOnce();
     expect(screen.getByRole("status").textContent).toBe(
       "Last reorder undone",
+    );
+  });
+
+  it("restores the original import order when images were rearranged", async () => {
+    const user = userEvent.setup();
+    const props = renderSidebar({ canRestoreImportOrder: true });
+
+    await user.click(
+      screen.getByRole("button", { name: "Restore import order" }),
+    );
+
+    expect(props.onRestoreImportOrder).toHaveBeenCalledOnce();
+    expect(screen.getByRole("status").textContent).toBe(
+      "Original import order restored",
     );
   });
 

@@ -57,6 +57,8 @@ function App() {
     reorderImage,
     undoReorder,
     canUndoReorder,
+    restoreImportOrder,
+    canRestoreImportOrder,
     deleteImage,
     handleImageLoadError,
     clearImages,
@@ -465,6 +467,8 @@ function App() {
           onReorder={reorderImage}
           onUndoReorder={undoReorder}
           canUndoReorder={canUndoReorder}
+          onRestoreImportOrder={restoreImportOrder}
+          canRestoreImportOrder={canRestoreImportOrder}
           onDelete={deleteImage}
           onImageLoadError={handleImageLoadError}
         />

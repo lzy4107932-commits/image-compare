@@ -1527,7 +1527,16 @@ button[aria-selected="true"]:not(:disabled) {
   gap: 8px;
 }
 
-.undo-reorder-button {
+.sidebar-order-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.undo-reorder-button,
+.restore-import-order-button {
   min-width: 30px;
   height: 28px;
   padding: 0 7px;
@@ -1546,18 +1555,21 @@ button[aria-selected="true"]:not(:disabled) {
   cursor: pointer;
 }
 
-.undo-reorder-button:hover:not(:disabled) {
+.undo-reorder-button:hover:not(:disabled),
+.restore-import-order-button:hover:not(:disabled) {
   color: var(--theme-accent);
   border-color: var(--theme-accent);
   background: var(--theme-control-hover);
 }
 
-.undo-reorder-button:disabled {
+.undo-reorder-button:disabled,
+.restore-import-order-button:disabled {
   opacity: 0.42;
   cursor: not-allowed;
 }
 
-.sidebar-header .undo-reorder-button > span {
+.sidebar-header .undo-reorder-button > span,
+.sidebar-header .restore-import-order-button > span {
   color: inherit;
   font-size: inherit;
 }

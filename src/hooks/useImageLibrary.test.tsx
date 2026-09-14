@@ -117,4 +117,46 @@ describe("useImageLibrary object URL lifecycle", () => {
       "The total image size limit has been reached",
     );
   });
+
+  it("restores import order and allows that restoration to be undone", () => {
+    createObjectURL
+      .mockReturnValueOnce("blob:first")
+      .mockReturnValueOnce("blob:second")
+      .mockReturnValueOnce("blob:third");
+    const { result } = renderHook(() => useImageLibrary(), {
+      wrapper: Wrapper,
+    });
+
+    act(() => {
+      result.current.addImageFiles([
+        new File(["one"], "first.png", { type: "image/png" }),
+        new File(["two"], "second.png", { type: "image/png" }),
+        new File(["three"], "third.png", { type: "image/png" }),
+      ]);
+    });
+
+    const originalOrder = result.current.images.map(({ id }) => id);
+
+    act(() => {
+      result.current.reorderImage(originalOrder[0], 3);
+    });
+
+    const reordered = result.current.images.map(({ id }) => id);
+    expect(result.current.canRestoreImportOrder).toBe(true);
+
+    act(() => {
+      result.current.restoreImportOrder();
+    });
+
+    expect(result.current.images.map(({ id }) => id)).toEqual(originalOrder);
+    expect(result.current.canRestoreImportOrder).toBe(false);
+    expect(result.current.canUndoReorder).toBe(true);
+
+    act(() => {
+      result.current.undoReorder();
+    });
+
+    expect(result.current.images.map(({ id }) => id)).toEqual(reordered);
+    expect(result.current.canRestoreImportOrder).toBe(true);
+  });
 });

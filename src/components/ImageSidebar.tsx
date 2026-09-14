@@ -2,6 +2,7 @@ import { useState, type DragEvent, type KeyboardEvent } from "react";
 import {
   GripVertical,
   Image as ImageIcon,
+  RotateCcw,
   Trash2,
   Undo2,
 } from "lucide-react";
@@ -20,6 +21,8 @@ type Props = {
   onReorder: (imageId: string, toIndex: number) => void;
   onUndoReorder: () => void;
   canUndoReorder: boolean;
+  onRestoreImportOrder: () => void;
+  canRestoreImportOrder: boolean;
   onDelete: (imageId: string) => void;
   onImageLoadError: (imageId: string) => void;
 };
@@ -35,6 +38,8 @@ export default function ImageSidebar({
   onReorder,
   onUndoReorder,
   canUndoReorder,
+  onRestoreImportOrder,
+  canRestoreImportOrder,
   onDelete,
   onImageLoadError,
 }: Props) {
@@ -73,6 +78,11 @@ export default function ImageSidebar({
   function handleUndoReorder() {
     onUndoReorder();
     setReorderAnnouncement(t("reorderUndone"));
+  }
+
+  function handleRestoreImportOrder() {
+    onRestoreImportOrder();
+    setReorderAnnouncement(t("importOrderRestored"));
   }
 
   function handleDragStart(event: DragEvent<HTMLButtonElement>, imageId: string) {
@@ -172,17 +182,30 @@ export default function ImageSidebar({
             {images.length} {t("imagesUnit")}
           </span>
         </div>
-        <button
-          type="button"
-          className="undo-reorder-button"
-          title={t("undoReorder")}
-          aria-label={t("undoReorder")}
-          disabled={!canUndoReorder}
-          onClick={handleUndoReorder}
-        >
-          <Undo2 size={15} />
-          <span>{t("undoReorder")}</span>
-        </button>
+        <div className="sidebar-order-actions">
+          <button
+            type="button"
+            className="undo-reorder-button"
+            title={t("undoReorder")}
+            aria-label={t("undoReorder")}
+            disabled={!canUndoReorder}
+            onClick={handleUndoReorder}
+          >
+            <Undo2 size={15} />
+            <span>{t("undoShort")}</span>
+          </button>
+          <button
+            type="button"
+            className="restore-import-order-button"
+            title={t("restoreImportOrder")}
+            aria-label={t("restoreImportOrder")}
+            disabled={!canRestoreImportOrder}
+            onClick={handleRestoreImportOrder}
+          >
+            <RotateCcw size={15} />
+            <span>{t("originalOrderShort")}</span>
+          </button>
+        </div>
       </div>
 
       <div className="image-list" onDragOver={handleListDragOver}>

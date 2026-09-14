@@ -35,6 +35,10 @@ const translations = {
     listPosition: "位置",
     undoReorder: "撤销排序",
     reorderUndone: "已撤销上一次排序",
+    restoreImportOrder: "恢复导入顺序",
+    importOrderRestored: "已恢复最初导入顺序",
+    undoShort: "撤销",
+    originalOrderShort: "原始顺序",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -171,6 +175,10 @@ const translations = {
     listPosition: "position",
     undoReorder: "Undo reorder",
     reorderUndone: "Last reorder undone",
+    restoreImportOrder: "Restore import order",
+    importOrderRestored: "Original import order restored",
+    undoShort: "Undo",
+    originalOrderShort: "Original",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",
