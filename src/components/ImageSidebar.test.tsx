@@ -89,6 +89,19 @@ describe("ImageSidebar", () => {
     expect(props.onImageLoadError).toHaveBeenCalledWith("one");
   });
 
+  it("falls back to the original when a generated thumbnail fails", () => {
+    const props = renderSidebar({
+      images: [{ ...images[0], thumbnailUrl: "blob:first-thumbnail" }],
+    });
+    const thumbnail = screen.getByRole("img", { name: "first.png" });
+
+    expect(thumbnail.getAttribute("src")).toBe("blob:first-thumbnail");
+    fireEvent.error(thumbnail);
+
+    expect(thumbnail.getAttribute("src")).toBe("blob:first");
+    expect(props.onImageLoadError).not.toHaveBeenCalled();
+  });
+
   it("filters by file name and locates the selected image", async () => {
     const user = userEvent.setup();
     renderSidebar();

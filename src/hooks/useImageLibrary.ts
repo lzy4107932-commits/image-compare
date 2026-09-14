@@ -16,6 +16,12 @@ import {
   MAX_TOTAL_IMAGE_MIB,
   selectImportableImages,
 } from "../utils/imageImport";
+import {
+  AsyncTaskQueue,
+  createImageThumbnail,
+  revokeImageObjectUrls,
+  THUMBNAIL_CONCURRENCY,
+} from "../utils/imageThumbnail";
 
 function createImageId(file: File, index: number) {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${index}-${file.name}`;
@@ -32,6 +38,9 @@ export function useImageLibrary() {
   const importOrderRef = useRef<string[]>([]);
   const [canUndoReorder, setCanUndoReorder] = useState(false);
   const [canRestoreImportOrder, setCanRestoreImportOrder] = useState(false);
+  const [thumbnailQueue] = useState(
+    () => new AsyncTaskQueue(THUMBNAIL_CONCURRENCY),
+  );
 
   const updateCanRestoreImportOrder = useCallback(() => {
     const currentOrder = stateRef.current.images.map((image) => image.id);
@@ -52,13 +61,14 @@ export function useImageLibrary() {
   useEffect(() => {
     return () => {
       stateRef.current.images.forEach((image) => {
-        URL.revokeObjectURL(image.url);
+        revokeImageObjectUrls(image);
       });
+      thumbnailQueue.clear();
       stateRef.current = INITIAL_IMAGE_LIBRARY_STATE;
       importOrderRef.current = [];
       previousOrderRef.current = null;
     };
-  }, []);
+  }, [thumbnailQueue]);
 
   const addImageFiles = useCallback(
     (fileList: FileList | File[]) => {
@@ -112,8 +122,37 @@ export function useImageLibrary() {
       importOrderRef.current.push(...images.map((image) => image.id));
       applyAction({ type: "add", images });
       updateCanRestoreImportOrder();
+
+      images.forEach((image, index) => {
+        const file = selection.accepted[index];
+
+        thumbnailQueue.enqueue(async () => {
+          if (!stateRef.current.images.some(({ id }) => id === image.id)) {
+            return;
+          }
+
+          const thumbnail = await createImageThumbnail(file);
+
+          if (!thumbnail) {
+            return;
+          }
+
+          const thumbnailUrl = URL.createObjectURL(thumbnail);
+
+          if (!stateRef.current.images.some(({ id }) => id === image.id)) {
+            URL.revokeObjectURL(thumbnailUrl);
+            return;
+          }
+
+          applyAction({
+            type: "set-thumbnail",
+            imageId: image.id,
+            thumbnailUrl,
+          });
+        });
+      });
     },
-    [applyAction, t, updateCanRestoreImportOrder],
+    [applyAction, t, thumbnailQueue, updateCanRestoreImportOrder],
   );
 
   const selectImage = useCallback(
@@ -196,7 +235,7 @@ export function useImageLibrary() {
       importOrderRef.current = importOrderRef.current.filter(
         (currentId) => currentId !== imageId,
       );
-      URL.revokeObjectURL(target.url);
+      revokeImageObjectUrls(target);
       applyAction({ type: "delete", imageId });
       updateCanRestoreImportOrder();
     },
@@ -217,15 +256,16 @@ export function useImageLibrary() {
 
   const clearImages = useCallback(() => {
     stateRef.current.images.forEach((image) => {
-      URL.revokeObjectURL(image.url);
+      revokeImageObjectUrls(image);
     });
+    thumbnailQueue.clear();
     applyAction({ type: "clear" });
     previousOrderRef.current = null;
     importOrderRef.current = [];
     setCanUndoReorder(false);
     setCanRestoreImportOrder(false);
     setImportNotice(null);
-  }, [applyAction]);
+  }, [applyAction, thumbnailQueue]);
 
   return {
     images: state.images,

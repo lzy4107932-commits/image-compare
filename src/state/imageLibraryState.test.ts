@@ -27,6 +27,23 @@ describe("imageLibraryReducer", () => {
     expect(getCompareBImage(state)?.id).toBe("two");
   });
 
+  it("adds a thumbnail without replacing the original image URL", () => {
+    const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
+      type: "add",
+      images: [image("one")],
+    });
+    const state = imageLibraryReducer(initial, {
+      type: "set-thumbnail",
+      imageId: "one",
+      thumbnailUrl: "blob:thumbnail",
+    });
+
+    expect(state.images[0]).toMatchObject({
+      url: "one",
+      thumbnailUrl: "blob:thumbnail",
+    });
+  });
+
   it("swaps A and B when assigning the opposite image", () => {
     const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
       type: "add",
@@ -148,6 +165,13 @@ describe("imageLibraryReducer", () => {
     ).toBe(initial);
     expect(
       imageLibraryReducer(initial, { type: "delete", imageId: "missing" }),
+    ).toBe(initial);
+    expect(
+      imageLibraryReducer(initial, {
+        type: "set-thumbnail",
+        imageId: "missing",
+        thumbnailUrl: "blob:missing",
+      }),
     ).toBe(initial);
     expect(
       imageLibraryReducer(initial, { type: "set-a", imageId: "missing" }),

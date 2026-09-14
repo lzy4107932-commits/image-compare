@@ -9,6 +9,7 @@ export type ImageLibraryState = {
 
 export type ImageLibraryAction =
   | { type: "add"; images: LocalImage[] }
+  | { type: "set-thumbnail"; imageId: string; thumbnailUrl: string }
   | { type: "select"; imageId: string }
   | { type: "set-a"; imageId: string }
   | { type: "set-b"; imageId: string }
@@ -69,6 +70,24 @@ export function imageLibraryReducer(
         compareAId: state.compareAId ?? action.images[0]?.id ?? null,
         compareBId: state.compareBId ?? action.images[1]?.id ?? null,
       };
+
+    case "set-thumbnail": {
+      const imageIndex = state.images.findIndex(
+        (image) => image.id === action.imageId,
+      );
+
+      if (imageIndex < 0) {
+        return state;
+      }
+
+      const images = [...state.images];
+      images[imageIndex] = {
+        ...images[imageIndex],
+        thumbnailUrl: action.thumbnailUrl,
+      };
+
+      return { ...state, images };
+    }
 
     case "select":
       return state.images.some((image) => image.id === action.imageId)

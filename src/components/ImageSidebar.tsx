@@ -401,12 +401,23 @@ export default function ImageSidebar({
                   aria-pressed={selectedImageId === image.id}
                 >
                   <img
-                    src={image.url}
+                    src={image.thumbnailUrl ?? image.url}
                     alt={image.name}
                     loading="lazy"
                     decoding="async"
                     draggable={false}
-                    onError={() => onImageLoadError(image.id)}
+                    onError={(event) => {
+                      if (
+                        image.thumbnailUrl &&
+                        event.currentTarget.getAttribute("src") ===
+                          image.thumbnailUrl
+                      ) {
+                        event.currentTarget.src = image.url;
+                        return;
+                      }
+
+                      onImageLoadError(image.id);
+                    }}
                   />
 
                   <div className="image-item-info">
