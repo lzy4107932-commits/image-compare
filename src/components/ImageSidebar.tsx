@@ -54,6 +54,7 @@ export default function ImageSidebar({
 }: Props) {
   const { t } = useI18n();
   const [filterQuery, setFilterQuery] = useState("");
+  const [locatedImageId, setLocatedImageId] = useState<string | null>(null);
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [reorderAnnouncement, setReorderAnnouncement] = useState("");
   const [dropTarget, setDropTarget] = useState<{
@@ -62,6 +63,8 @@ export default function ImageSidebar({
     edge: "before" | "after";
   } | null>(null);
   const itemRefs = useRef(new Map<string, HTMLDivElement>());
+  const filterInputRef = useRef<HTMLInputElement>(null);
+  const locateTimerRef = useRef<number | null>(null);
   const normalizedFilter = filterQuery.trim().toLocaleLowerCase();
   const visibleImages = normalizedFilter
     ? images.filter((image) =>
@@ -80,6 +83,26 @@ export default function ImageSidebar({
       selectedItem.scrollIntoView({ block: "nearest", behavior: "auto" });
     }
   }, [normalizedFilter, selectedImageId]);
+
+  useEffect(() => {
+    function handleSearchShortcut(event: globalThis.KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+        event.preventDefault();
+        filterInputRef.current?.focus();
+        filterInputRef.current?.select();
+      }
+    }
+
+    window.addEventListener("keydown", handleSearchShortcut);
+
+    return () => {
+      window.removeEventListener("keydown", handleSearchShortcut);
+
+      if (locateTimerRef.current !== null) {
+        window.clearTimeout(locateTimerRef.current);
+      }
+    };
+  }, []);
 
   function clearDragState() {
     setDraggedImageId(null);
@@ -117,15 +140,32 @@ export default function ImageSidebar({
   function locateCurrentImage() {
     if (filterQuery) {
       setFilterQuery("");
-      return;
     }
 
     if (selectedImageId) {
       const selectedItem = itemRefs.current.get(selectedImageId);
+      const selectedIndex = images.findIndex(
+        (image) => image.id === selectedImageId,
+      );
+      const selectedImage = images[selectedIndex];
 
       if (typeof selectedItem?.scrollIntoView === "function") {
         selectedItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
+
+      setLocatedImageId(selectedImageId);
+      setReorderAnnouncement(
+        `${t("currentImageLocated")}: ${selectedImage?.name ?? ""}, ${t("listPosition")} ${selectedIndex + 1}`,
+      );
+
+      if (locateTimerRef.current !== null) {
+        window.clearTimeout(locateTimerRef.current);
+      }
+
+      locateTimerRef.current = window.setTimeout(() => {
+        setLocatedImageId(null);
+        locateTimerRef.current = null;
+      }, 1000);
     }
   }
 
@@ -255,13 +295,25 @@ export default function ImageSidebar({
       <div className="sidebar-filter" role="search">
         <Search size={14} aria-hidden="true" />
         <input
+          ref={filterInputRef}
           type="search"
           value={filterQuery}
           aria-label={t("filterImages")}
           placeholder={t("filterImagesPlaceholder")}
           disabled={images.length === 0}
           onChange={(event) => setFilterQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && filterQuery) {
+              event.preventDefault();
+              setFilterQuery("");
+            }
+          }}
         />
+        {normalizedFilter && (
+          <span className="sidebar-filter-count" aria-live="polite">
+            {visibleImages.length}/{images.length}
+          </span>
+        )}
         {filterQuery && (
           <button
             type="button"
@@ -316,6 +368,7 @@ export default function ImageSidebar({
                   "image-item",
                   selectedImageId === image.id ? "selected" : "",
                   draggedImageId === image.id ? "is-dragging" : "",
+                  locatedImageId === image.id ? "is-located" : "",
                   dropTarget?.imageId === image.id
                     ? `is-drop-${dropTarget.edge}`
                     : "",

@@ -44,6 +44,7 @@ const translations = {
     clearFilter: "清除筛选",
     locateCurrentImage: "定位当前图片",
     noMatchingImages: "没有匹配的图片",
+    currentImageLocated: "已定位当前图片",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -189,6 +190,7 @@ const translations = {
     clearFilter: "Clear filter",
     locateCurrentImage: "Locate current image",
     noMatchingImages: "No matching images",
+    currentImageLocated: "Current image located",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

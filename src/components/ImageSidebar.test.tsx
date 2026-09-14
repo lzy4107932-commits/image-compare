@@ -102,6 +102,7 @@ describe("ImageSidebar", () => {
     expect(
       screen.getByRole("button", { name: "Select image: second.png" }),
     ).toBeDefined();
+    expect(screen.getByText("1/2")).toBeDefined();
 
     await user.click(
       screen.getByRole("button", { name: "Locate current image" }),
@@ -111,6 +112,23 @@ describe("ImageSidebar", () => {
     expect(
       screen.getByRole("button", { name: "Select image: first.png" }),
     ).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe(
+      "Current image located: first.png, position 1",
+    );
+  });
+
+  it("focuses filtering with Ctrl+F and clears it with Escape", async () => {
+    const user = userEvent.setup();
+    renderSidebar();
+    const filter = screen.getByRole("searchbox", { name: "Filter images" });
+
+    fireEvent.keyDown(window, { key: "f", ctrlKey: true });
+    expect(document.activeElement).toBe(filter);
+
+    await user.type(filter, "first");
+    fireEvent.keyDown(filter, { key: "Escape" });
+
+    expect((filter as HTMLInputElement).value).toBe("");
   });
 
   it("undoes the most recent reorder when history is available", async () => {
