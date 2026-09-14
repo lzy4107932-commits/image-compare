@@ -57,64 +57,65 @@ export default function ImageSidebar({
                     ? "image-item selected"
                     : "image-item"
                 }
-                onClick={() => onSelect(image.id)}
               >
-                <img
-                  src={image.url}
-                  alt={image.name}
-                  onError={() => onImageLoadError(image.id)}
-                />
+                <button
+                  type="button"
+                  className="image-item-select"
+                  onClick={() => onSelect(image.id)}
+                  aria-label={`${t("selectImage")}: ${image.name}`}
+                  aria-pressed={selectedImageId === image.id}
+                >
+                  <img
+                    src={image.url}
+                    alt={image.name}
+                    onError={() => onImageLoadError(image.id)}
+                  />
 
-                <div className="image-item-info">
-                  <strong title={image.name}>{image.name}</strong>
+                  <div className="image-item-info">
+                    <strong title={image.name}>{image.name}</strong>
 
-                  <span>
-                    {t("imageNumber")} {index + 1}
-                  </span>
-
-                  <div className="image-role-actions">
-                    <button
-                      type="button"
-                      className={
-                        isImageA
-                          ? "role-button role-a active"
-                          : "role-button role-a"
-                      }
-                      title={t("setAsImageA")}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onSetAsA(image.id);
-                      }}
-                    >
-                      A
-                    </button>
-
-                    <button
-                      type="button"
-                      className={
-                        isImageB
-                          ? "role-button role-b active"
-                          : "role-button role-b"
-                      }
-                      title={t("setAsImageB")}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onSetAsB(image.id);
-                      }}
-                    >
-                      B
-                    </button>
+                    <span>
+                      {t("imageNumber")} {index + 1}
+                    </span>
                   </div>
+                </button>
+
+                <div className="image-role-actions">
+                  <button
+                    type="button"
+                    className={
+                      isImageA
+                        ? "role-button role-a active"
+                        : "role-button role-a"
+                    }
+                    title={t("setAsImageA")}
+                    aria-label={`${t("setAsImageA")}: ${image.name}`}
+                    onClick={() => onSetAsA(image.id)}
+                  >
+                    A
+                  </button>
+
+                  <button
+                    type="button"
+                    className={
+                      isImageB
+                        ? "role-button role-b active"
+                        : "role-button role-b"
+                    }
+                    title={t("setAsImageB")}
+                    aria-label={`${t("setAsImageB")}: ${image.name}`}
+                    onClick={() => onSetAsB(image.id)}
+                  >
+                    B
+                  </button>
                 </div>
 
                 <button
                   type="button"
                   className="delete-image-button"
                   title={t("delete")}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDelete(image.id);
-                  }}
+                  aria-label={`${t("delete")}: ${image.name}`}
+                  onClick={() => onDelete(image.id)}
                 >
                   <Trash2 size={15} />
                 </button>

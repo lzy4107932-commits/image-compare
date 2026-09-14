@@ -111,6 +111,7 @@ const translations = {
     rotateClockwise: "顺时针旋转",
     setAsImageA: "设为图片 A",
     setAsImageB: "设为图片 B",
+    selectImage: "选择图片",
     needTwoImagesDescription: "请导入至少两张图片，然后在左侧分别设置 A 和 B。",
     singleImageZoom: "单图缩放",
     unsupportedImagesSkipped: "已跳过不支持的文件",
@@ -229,6 +230,7 @@ const translations = {
     rotateClockwise: "Rotate clockwise",
     setAsImageA: "Set as image A",
     setAsImageB: "Set as image B",
+    selectImage: "Select image",
     needTwoImagesDescription:
       "Import at least two images, then assign A and B from the sidebar.",
     singleImageZoom: "Single image zoom",
