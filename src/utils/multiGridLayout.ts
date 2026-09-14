@@ -1,5 +1,6 @@
 const DEFAULT_GRID_GAP = 2;
 const DEFAULT_MIN_CARD_WIDTH = 220;
+const DEFAULT_MIN_CARD_HEIGHT = 180;
 
 function formatCssNumber(value: number) {
   return Number(value.toFixed(6));
@@ -49,4 +50,39 @@ export function getMultiGridCardBasis(
   );
 
   return `min(100%, max(${minCardWidth}px, calc(${percentage}% - ${gapShare}px)))`;
+}
+
+export function getResponsiveMultiGridColumns(
+  imageCount: number,
+  containerWidth: number,
+  gap = DEFAULT_GRID_GAP,
+  minCardWidth = DEFAULT_MIN_CARD_WIDTH,
+) {
+  const preferredColumns = getPreferredMultiGridColumns(imageCount);
+
+  if (containerWidth <= 0) {
+    return preferredColumns;
+  }
+
+  const availableWidth = Math.max(0, containerWidth - gap * 2);
+  const fittingColumns = Math.max(
+    1,
+    Math.floor((availableWidth + gap) / (minCardWidth + gap)),
+  );
+
+  return Math.min(preferredColumns, fittingColumns);
+}
+
+export function getMultiGridCardHeight(
+  rows: number,
+  gap = DEFAULT_GRID_GAP,
+  minCardHeight = DEFAULT_MIN_CARD_HEIGHT,
+) {
+  const safeRows = Math.max(1, Math.floor(rows));
+  const percentage = formatCssNumber(100 / safeRows);
+  const gapShare = formatCssNumber(
+    (gap * Math.max(0, safeRows - 1)) / safeRows,
+  );
+
+  return `min(100%, max(${minCardHeight}px, calc(${percentage}% - ${gapShare}px)))`;
 }

@@ -16,7 +16,9 @@ import {
 } from "../utils/viewerKeyboard";
 import {
   getMultiGridCardBasis,
+  getMultiGridCardHeight,
   getPreferredMultiGridColumns,
+  getResponsiveMultiGridColumns,
 } from "../utils/multiGridLayout";
 
 type DragState = {
@@ -36,6 +38,7 @@ type Props = {
 export default function MultiCompareView({ images }: Props) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const dragRef = useRef<DragState | null>(null);
 
@@ -215,6 +218,40 @@ export default function MultiCompareView({ images }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) {
+      return;
+    }
+
+    function updateWidth(width = root?.clientWidth ?? 0) {
+      setContainerWidth(width);
+    }
+
+    function handleWindowResize() {
+      updateWidth();
+    }
+
+    updateWidth();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", handleWindowResize);
+
+      return () => {
+        window.removeEventListener("resize", handleWindowResize);
+      };
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      updateWidth(entries[0]?.contentRect.width);
+    });
+
+    observer.observe(root);
+
+    return () => observer.disconnect();
+  }, []);
+
   function resetLocalTransform(imageId: string) {
     const globalScale = globalTransform.zoom / 100;
 
@@ -373,8 +410,14 @@ export default function MultiCompareView({ images }: Props) {
       : null;
 
   const preferredColumns = getPreferredMultiGridColumns(images.length);
+  const columns = getResponsiveMultiGridColumns(
+    images.length,
+    containerWidth,
+  );
+  const rows = Math.max(1, Math.ceil(images.length / columns));
   const gridStyle = {
-    "--multi-grid-card-basis": getMultiGridCardBasis(preferredColumns),
+    "--multi-grid-card-basis": getMultiGridCardBasis(columns),
+    "--multi-grid-card-height": getMultiGridCardHeight(rows),
   } as React.CSSProperties;
 
   return (
@@ -440,7 +483,9 @@ export default function MultiCompareView({ images }: Props) {
       <div className="multi-compare-shell" ref={rootRef}>
         <div
           className="grid-view multi-compare-view"
-          data-layout-columns={preferredColumns}
+          data-layout-columns={columns}
+          data-layout-rows={rows}
+          data-preferred-columns={preferredColumns}
           style={gridStyle}
         >
           {images.map((image) => {

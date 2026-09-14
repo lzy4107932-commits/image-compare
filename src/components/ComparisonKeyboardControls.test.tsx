@@ -111,8 +111,12 @@ describe("comparison keyboard controls", () => {
     const grid = document.querySelector<HTMLElement>(".multi-compare-view");
 
     expect(grid?.dataset.layoutColumns).toBe("3");
+    expect(grid?.dataset.layoutRows).toBe("1");
     expect(grid?.style.getPropertyValue("--multi-grid-card-basis")).toContain(
       "33.333333%",
+    );
+    expect(grid?.style.getPropertyValue("--multi-grid-card-height")).toContain(
+      "100%",
     );
 
     for (const image of screen.getAllByRole("img")) {

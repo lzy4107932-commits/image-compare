@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   getMultiGridCardBasis,
+  getMultiGridCardHeight,
   getPreferredMultiGridColumns,
+  getResponsiveMultiGridColumns,
 } from "./multiGridLayout";
 
 describe("multi-image grid layout", () => {
@@ -24,6 +26,21 @@ describe("multi-image grid layout", () => {
     );
     expect(getMultiGridCardBasis(2)).toBe(
       "min(100%, max(220px, calc(50% - 1px)))",
+    );
+  });
+
+  it("reduces the column count when the viewer becomes narrow", () => {
+    expect(getResponsiveMultiGridColumns(8, 1200)).toBe(4);
+    expect(getResponsiveMultiGridColumns(8, 800)).toBe(3);
+    expect(getResponsiveMultiGridColumns(4, 430)).toBe(1);
+  });
+
+  it("allocates the full available height between rows", () => {
+    expect(getMultiGridCardHeight(1)).toBe(
+      "min(100%, max(180px, calc(100% - 0px)))",
+    );
+    expect(getMultiGridCardHeight(2)).toBe(
+      "min(100%, max(180px, calc(50% - 1px)))",
     );
   });
 });
