@@ -10,6 +10,7 @@ import EmptyState from "./components/EmptyState";
 import ImageSidebar from "./components/ImageSidebar";
 import ImportNotice from "./components/ImportNotice";
 import StatusBar from "./components/StatusBar";
+import SingleImageView from "./components/SingleImageView";
 import ViewerToolbar from "./components/ViewerToolbar";
 import { useImageLibrary } from "./hooks/useImageLibrary";
 import { useI18n } from "./useI18n";
@@ -488,24 +489,13 @@ function App() {
             ) : (
               <>
                 {viewMode === "single" && selectedImage && (
-                  <div className="single-view">
-                    <img
-                      src={selectedImage.url}
-                      alt={selectedImage.name}
-                      decoding="async"
-                      draggable={false}
-                      style={{
-                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${
-                          zoom / 100
-                        }) rotate(${rotation}deg)`,
-                      }}
-                    />
-                    {showFileNames && (
-                      <div className="viewer-file-name single-file-name">
-                        {selectedImage.name}
-                      </div>
-                    )}
-                  </div>
+                  <SingleImageView
+                    image={selectedImage}
+                    showFileName={showFileNames}
+                    transform={`translate(${pan.x}px, ${pan.y}px) scale(${
+                      zoom / 100
+                    }) rotate(${rotation}deg)`}
+                  />
                 )}
 
                 {viewMode === "compare" && (
