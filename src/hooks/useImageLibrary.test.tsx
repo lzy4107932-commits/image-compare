@@ -148,6 +148,29 @@ describe("useImageLibrary object URL lifecycle", () => {
     );
   });
 
+  it("releases a maximum-size batch when it is immediately cleared", () => {
+    createObjectURL.mockImplementation(
+      () => `blob:stress-${createObjectURL.mock.calls.length}`,
+    );
+    const { result } = renderHook(() => useImageLibrary(), {
+      wrapper: Wrapper,
+    });
+    const files = Array.from(
+      { length: 100 },
+      (_, index) =>
+        new File(["image"], `stress-${index}.png`, { type: "image/png" }),
+    );
+
+    act(() => {
+      result.current.addImageFiles(files);
+      result.current.clearImages();
+    });
+
+    expect(result.current.images).toHaveLength(0);
+    expect(createObjectURL).toHaveBeenCalledTimes(100);
+    expect(revokeObjectURL).toHaveBeenCalledTimes(100);
+  });
+
   it("restores import order and allows that restoration to be undone", () => {
     createObjectURL
       .mockReturnValueOnce("blob:first")

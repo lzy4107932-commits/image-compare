@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Grid3X3,
@@ -10,6 +10,7 @@ import {
 import { useI18n } from "../useI18n";
 import { useFrameScheduler } from "../hooks/useFrameScheduler";
 import type { LocalImage } from "../types";
+import { haveSameDisplayImages } from "../utils/imageDisplay";
 import {
   clampZoom,
   composeTransforms,
@@ -54,7 +55,7 @@ type PendingDragUpdate = {
   y: number;
 };
 
-export default function MultiCompareView({
+function MultiCompareView({
   images,
   showFileNames,
   onToggleFileNames,
@@ -605,3 +606,12 @@ export default function MultiCompareView({
     </>
   );
 }
+
+export default memo(MultiCompareView, (previous, next) => {
+  return (
+    haveSameDisplayImages(previous.images, next.images) &&
+    previous.showFileNames === next.showFileNames &&
+    previous.onToggleFileNames === next.onToggleFileNames &&
+    previous.onImageLoadError === next.onImageLoadError
+  );
+});

@@ -72,6 +72,9 @@ function App() {
   const [showFileNames, setShowFileNames] = useState(
     () => localStorage.getItem("image-compare-show-file-names") !== "false",
   );
+  const toggleFileNames = useCallback(() => {
+    setShowFileNames((current) => !current);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(
@@ -483,7 +486,7 @@ function App() {
             onReset={resetView}
             onRotate={handleRotateClockwise}
             showFileNames={showFileNames}
-            onToggleFileNames={() => setShowFileNames((current) => !current)}
+            onToggleFileNames={toggleFileNames}
           />
 
           <div
@@ -531,9 +534,7 @@ function App() {
                     onHelpChange={setCompareHelp}
                     showFileNames={showFileNames}
                     onImageLoadError={handleImageLoadError}
-                    onToggleFileNames={() =>
-                      setShowFileNames((current) => !current)
-                    }
+                    onToggleFileNames={toggleFileNames}
                   />
                 )}
                 {viewMode === "grid" && (
@@ -541,9 +542,7 @@ function App() {
                     images={images}
                     showFileNames={showFileNames}
                     onImageLoadError={handleImageLoadError}
-                    onToggleFileNames={() =>
-                      setShowFileNames((current) => !current)
-                    }
+                    onToggleFileNames={toggleFileNames}
                   />
                 )}
               </>

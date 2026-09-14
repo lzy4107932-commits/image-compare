@@ -1,4 +1,6 @@
+import { memo } from "react";
 import type { LocalImage } from "../types";
+import { hasSameDisplayImage } from "../utils/imageDisplay";
 import FileNameOverlay from "./FileNameOverlay";
 
 type Props = {
@@ -9,7 +11,7 @@ type Props = {
   onImageLoadError?: (imageId: string) => void;
 };
 
-export default function SingleImageView({
+function SingleImageView({
   image,
   showFileName,
   rotation,
@@ -39,3 +41,13 @@ export default function SingleImageView({
     </div>
   );
 }
+
+export default memo(SingleImageView, (previous, next) => {
+  return (
+    hasSameDisplayImage(previous.image, next.image) &&
+    previous.showFileName === next.showFileName &&
+    previous.rotation === next.rotation &&
+    previous.transform === next.transform &&
+    previous.onImageLoadError === next.onImageLoadError
+  );
+});

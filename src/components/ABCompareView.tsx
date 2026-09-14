@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  memo,
   useRef,
   useState,
   type SetStateAction,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { useI18n } from "../useI18n";
 import type { LocalImage } from "../types";
+import { hasSameDisplayImage } from "../utils/imageDisplay";
 import {
   clampZoom,
   composeTransforms,
@@ -61,7 +63,7 @@ type Props = {
   onImageLoadError?: (imageId: string) => void;
 };
 
-export default function ABCompareView({
+function ABCompareView({
   imageA,
   imageB,
   onHelpChange,
@@ -782,3 +784,14 @@ export default function ABCompareView({
     </>
   );
 }
+
+export default memo(ABCompareView, (previous, next) => {
+  return (
+    hasSameDisplayImage(previous.imageA, next.imageA) &&
+    hasSameDisplayImage(previous.imageB, next.imageB) &&
+    previous.onHelpChange === next.onHelpChange &&
+    previous.showFileNames === next.showFileNames &&
+    previous.onToggleFileNames === next.onToggleFileNames &&
+    previous.onImageLoadError === next.onImageLoadError
+  );
+});
