@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Eye,
-  EyeOff,
   Grid3X3,
   Maximize,
   Minus,
@@ -28,6 +26,7 @@ import {
   getPreferredMultiGridColumns,
   getResponsiveMultiGridColumns,
 } from "../utils/multiGridLayout";
+import FileNameToggle from "./FileNameToggle";
 
 type DragState = {
   imageId: string;
@@ -41,13 +40,18 @@ type DragState = {
 
 type Props = {
   images: LocalImage[];
+  showFileNames: boolean;
+  onToggleFileNames: () => void;
 };
 
-export default function MultiCompareView({ images }: Props) {
+export default function MultiCompareView({
+  images,
+  showFileNames,
+  onToggleFileNames,
+}: Props) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [showFileNames, setShowFileNames] = useState(true);
 
   const dragRef = useRef<DragState | null>(null);
 
@@ -465,21 +469,10 @@ export default function MultiCompareView({ images }: Props) {
               <Plus size={16} />
             </button>
 
-            <button
-              type="button"
-              className="multi-filename-toggle"
-              title={
-                showFileNames ? t("hideFileNames") : t("showFileNames")
-              }
-              aria-label={
-                showFileNames ? t("hideFileNames") : t("showFileNames")
-              }
-              aria-pressed={showFileNames}
-              onClick={() => setShowFileNames((current) => !current)}
-            >
-              {showFileNames ? <Eye size={16} /> : <EyeOff size={16} />}
-              <span>{t("fileNames")}</span>
-            </button>
+            <FileNameToggle
+              showFileNames={showFileNames}
+              onToggle={onToggleFileNames}
+            />
 
             <button
               type="button"
@@ -571,7 +564,10 @@ export default function MultiCompareView({ images }: Props) {
                   </span>
 
                   {showFileNames && (
-                    <div className="grid-card-name" title={image.name}>
+                    <div
+                      className="viewer-file-name grid-card-name"
+                      title={image.name}
+                    >
                       {image.name}
                     </div>
                   )}

@@ -19,6 +19,7 @@ describe("ViewerToolbar transform actions", () => {
     const user = userEvent.setup();
     const onRotate = vi.fn();
     const onReset = vi.fn();
+    const onToggleFileNames = vi.fn();
 
     render(
       <I18nProvider>
@@ -30,6 +31,8 @@ describe("ViewerToolbar transform actions", () => {
           onZoomIn={vi.fn()}
           onReset={onReset}
           onRotate={onRotate}
+          showFileNames={true}
+          onToggleFileNames={onToggleFileNames}
         />
       </I18nProvider>,
     );
@@ -57,6 +60,8 @@ describe("ViewerToolbar transform actions", () => {
     ).toBe("polite");
     expect(screen.getByText("125% · 90°")).toBeDefined();
 
+    await user.click(screen.getByRole("button", { name: "Hide file names" }));
+
     await user.click(rotate);
     if (reset) {
       await user.click(reset);
@@ -64,5 +69,6 @@ describe("ViewerToolbar transform actions", () => {
 
     expect(onRotate).toHaveBeenCalledOnce();
     expect(onReset).toHaveBeenCalledOnce();
+    expect(onToggleFileNames).toHaveBeenCalledOnce();
   });
 });

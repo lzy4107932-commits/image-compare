@@ -2,6 +2,7 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { I18nProvider } from "../i18n";
 import type { LocalImage } from "../types";
@@ -24,6 +25,31 @@ function addToolbarTargets() {
   document.body.append(actions);
 }
 
+function ABCompareHarness() {
+  const [showFileNames, setShowFileNames] = useState(true);
+
+  return (
+    <ABCompareView
+      imageA={images[0]}
+      imageB={images[1]}
+      showFileNames={showFileNames}
+      onToggleFileNames={() => setShowFileNames((current) => !current)}
+    />
+  );
+}
+
+function MultiCompareHarness() {
+  const [showFileNames, setShowFileNames] = useState(true);
+
+  return (
+    <MultiCompareView
+      images={images}
+      showFileNames={showFileNames}
+      onToggleFileNames={() => setShowFileNames((current) => !current)}
+    />
+  );
+}
+
 describe("comparison keyboard controls", () => {
   beforeEach(() => {
     localStorage.setItem("image-viewer-language", "en");
@@ -40,7 +66,7 @@ describe("comparison keyboard controls", () => {
 
     render(
       <I18nProvider>
-        <ABCompareView imageA={images[0]} imageB={images[1]} />
+        <ABCompareHarness />
       </I18nProvider>,
     );
 
@@ -55,6 +81,20 @@ describe("comparison keyboard controls", () => {
     ).toBe("true");
     expect(
       screen.getByRole("button", { name: "Overlay" }).getAttribute(
+        "aria-pressed",
+      ),
+    ).toBe("false");
+    expect(
+      screen
+        .getByRole("img", { name: "first.png" })
+        .closest(".ab-independent-viewport")
+        ?.querySelector(".viewer-file-name")?.textContent,
+    ).toBe("first.png");
+
+    await user.click(screen.getByRole("button", { name: "Hide file names" }));
+    expect(document.querySelector(".viewer-file-name")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Show file names" }).getAttribute(
         "aria-pressed",
       ),
     ).toBe("false");
@@ -101,7 +141,7 @@ describe("comparison keyboard controls", () => {
 
     render(
       <I18nProvider>
-        <MultiCompareView images={images} />
+        <MultiCompareHarness />
       </I18nProvider>,
     );
 

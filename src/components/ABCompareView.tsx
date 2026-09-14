@@ -27,6 +27,7 @@ import {
   getTransformKeyboardAction,
   isTextEditingTarget,
 } from "../utils/viewerKeyboard";
+import FileNameToggle from "./FileNameToggle";
 
 type CompareMode = "side" | "overlay";
 type OperationMode = "sync" | "a" | "b";
@@ -54,9 +55,17 @@ type Props = {
   imageA: LocalImage | null;
   imageB: LocalImage | null;
   onHelpChange?: (help: string) => void;
+  showFileNames: boolean;
+  onToggleFileNames: () => void;
 };
 
-export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
+export default function ABCompareView({
+  imageA,
+  imageB,
+  onHelpChange,
+  showFileNames,
+  onToggleFileNames,
+}: Props) {
   const { t } = useI18n();
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -591,6 +600,10 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
             >
               <Plus size={15} />
             </button>
+            <FileNameToggle
+              showFileNames={showFileNames}
+              onToggle={onToggleFileNames}
+            />
             <button
               type="button"
               className="transform-action-button transform-reset-button"
@@ -653,9 +666,10 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                   draggable={false}
                   style={transformStyleA}
                 />
+                {showFileNames && (
+                  <div className="viewer-file-name">{imageA.name}</div>
+                )}
               </div>
-
-              <div className="compare-name">{imageA.name}</div>
             </div>
 
             <div className="compare-divider" />
@@ -677,9 +691,10 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                   draggable={false}
                   style={transformStyleB}
                 />
+                {showFileNames && (
+                  <div className="viewer-file-name">{imageB.name}</div>
+                )}
               </div>
-
-              <div className="compare-name">{imageB.name}</div>
             </div>
           </div>
         ) : (
@@ -734,16 +749,21 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               <div className="overlay-label overlay-label-a">A</div>
 
               <div className="overlay-label overlay-label-b">B</div>
-            </div>
 
-            <div className="overlay-names">
-              <span>A：{imageA.name}</span>
+              {showFileNames && (
+                <>
+                  <div className="viewer-file-name ab-overlay-name is-a">
+                    A：{imageA.name}
+                  </div>
+                  <div className="viewer-file-name ab-overlay-name is-b">
+                    B：{imageB.name}
+                  </div>
+                </>
+              )}
 
-              <span>
+              <div className="ab-split-position">
                 {t("splitPosition")}: {Math.round(comparePosition)}%
-              </span>
-
-              <span>B：{imageB.name}</span>
+              </div>
             </div>
           </div>
         )}

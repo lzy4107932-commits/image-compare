@@ -256,7 +256,7 @@
  * 文件名改为画布内悬浮标签，不再单独占用图片下方 30px。
  * 渐变底色保证明暗图片上都能辨认，同时不会遮挡图片主体太多。
  */
-.grid-view.multi-compare-view .grid-card-name {
+.viewer-file-name {
   position: absolute;
   right: 5px;
   bottom: 5px;
@@ -280,11 +280,14 @@
 
   font-size: 11px;
   line-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   pointer-events: none;
 }
 
 /* 文件名显示开关同时提供图形、文字和按下状态。 */
-.multi-compare-toolbar-actions .multi-filename-toggle {
+.file-name-toggle {
   min-width: max-content;
   padding-right: 9px;
   padding-left: 9px;
@@ -293,6 +296,56 @@
   justify-content: center;
   gap: 5px;
   white-space: nowrap;
+}
+
+/* 单图名称固定在展示区域底部，不影响图片的居中和变换。 */
+.single-view {
+  position: relative;
+}
+
+.single-file-name {
+  right: 10px;
+  bottom: 8px;
+  left: 10px;
+}
+
+/* A/B 原底栏移除后，左右图片视口占据每个面板的全部高度。 */
+.ab-side-panel > .ab-independent-viewport {
+  flex: 1 1 100%;
+}
+
+/* 重叠模式的两个名称分别占据底部左右区域。 */
+.ab-overlay-name.is-a {
+  right: calc(50% + 54px);
+}
+
+.ab-overlay-name.is-b {
+  left: calc(50% + 54px);
+  text-align: right;
+}
+
+/* 分割位置保留为独立悬浮状态，不再占用 40px 底栏。 */
+.ab-split-position {
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  z-index: 21;
+  min-width: 92px;
+  height: 22px;
+  padding: 0 7px;
+
+  color: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 55%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--theme-surface) 82%, transparent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 28%);
+
+  font-size: 10px;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
 }
 /* ==================================================
    查看器顶部统一工具栏插槽

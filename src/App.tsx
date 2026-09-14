@@ -63,6 +63,16 @@ function App() {
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [compareHelp, setCompareHelp] = useState("");
+  const [showFileNames, setShowFileNames] = useState(
+    () => localStorage.getItem("image-compare-show-file-names") !== "false",
+  );
+
+  useEffect(() => {
+    localStorage.setItem(
+      "image-compare-show-file-names",
+      String(showFileNames),
+    );
+  }, [showFileNames]);
 
   /*
    * A/BCompareView 内部保存着“同步 / 调整 A / 调整 B”状态，
@@ -447,6 +457,8 @@ function App() {
             onZoomIn={zoomIn}
             onReset={resetView}
             onRotate={handleRotateClockwise}
+            showFileNames={showFileNames}
+            onToggleFileNames={() => setShowFileNames((current) => !current)}
           />
 
           <div
@@ -488,6 +500,11 @@ function App() {
                         }) rotate(${rotation}deg)`,
                       }}
                     />
+                    {showFileNames && (
+                      <div className="viewer-file-name single-file-name">
+                        {selectedImage.name}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -496,9 +513,21 @@ function App() {
                     imageA={compareAImage}
                     imageB={compareBImage}
                     onHelpChange={setCompareHelp}
+                    showFileNames={showFileNames}
+                    onToggleFileNames={() =>
+                      setShowFileNames((current) => !current)
+                    }
                   />
                 )}
-                {viewMode === "grid" && <MultiCompareView images={images} />}
+                {viewMode === "grid" && (
+                  <MultiCompareView
+                    images={images}
+                    showFileNames={showFileNames}
+                    onToggleFileNames={() =>
+                      setShowFileNames((current) => !current)
+                    }
+                  />
+                )}
               </>
             )}
           </div>

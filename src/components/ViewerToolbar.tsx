@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { ViewMode } from "../types";
 import { useI18n } from "../useI18n";
+import FileNameToggle from "./FileNameToggle";
 
 type Props = {
   viewMode: ViewMode;
@@ -17,6 +18,8 @@ type Props = {
   onZoomIn: () => void;
   onReset: () => void;
   onRotate: () => void;
+  showFileNames: boolean;
+  onToggleFileNames: () => void;
 };
 
 export default function ViewerToolbar({
@@ -27,6 +30,8 @@ export default function ViewerToolbar({
   onZoomIn,
   onReset,
   onRotate,
+  showFileNames,
+  onToggleFileNames,
 }: Props) {
   const { t } = useI18n();
 
@@ -87,6 +92,13 @@ export default function ViewerToolbar({
         >
           <ZoomIn size={18} />
         </button>
+
+        {viewMode === "single" && (
+          <FileNameToggle
+            showFileNames={showFileNames}
+            onToggle={onToggleFileNames}
+          />
+        )}
 
         {viewMode === "single" && (
           <button
