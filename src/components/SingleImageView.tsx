@@ -4,18 +4,26 @@ import FileNameOverlay from "./FileNameOverlay";
 type Props = {
   image: LocalImage;
   showFileName: boolean;
+  rotation: number;
   transform: string;
 };
 
 export default function SingleImageView({
   image,
   showFileName,
+  rotation,
   transform,
 }: Props) {
+  const isQuarterTurn = Math.abs(rotation % 180) === 90;
+
   return (
     <div className="single-view">
       <img
-        className="single-view-image"
+        className={
+          isQuarterTurn
+            ? "single-view-image is-quarter-turn"
+            : "single-view-image"
+        }
         src={image.url}
         alt={image.name}
         decoding="async"

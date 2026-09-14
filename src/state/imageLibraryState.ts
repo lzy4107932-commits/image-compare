@@ -12,6 +12,7 @@ export type ImageLibraryAction =
   | { type: "select"; imageId: string }
   | { type: "set-a"; imageId: string }
   | { type: "set-b"; imageId: string }
+  | { type: "reorder"; imageId: string; toIndex: number }
   | { type: "delete"; imageId: string }
   | { type: "clear" };
 
@@ -107,6 +108,34 @@ export function imageLibraryReducer(
             : state.compareAId,
         compareBId: action.imageId,
       };
+    }
+
+    case "reorder": {
+      const fromIndex = state.images.findIndex(
+        (image) => image.id === action.imageId,
+      );
+
+      if (fromIndex < 0) {
+        return state;
+      }
+
+      const insertionIndex = Math.min(
+        state.images.length,
+        Math.max(0, action.toIndex),
+      );
+      const nextImages = state.images.filter(
+        (image) => image.id !== action.imageId,
+      );
+      const adjustedIndex =
+        fromIndex < insertionIndex ? insertionIndex - 1 : insertionIndex;
+
+      if (adjustedIndex === fromIndex) {
+        return state;
+      }
+
+      nextImages.splice(adjustedIndex, 0, state.images[fromIndex]);
+
+      return { ...state, images: nextImages };
     }
 
     case "delete": {

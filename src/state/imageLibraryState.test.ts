@@ -84,6 +84,23 @@ describe("imageLibraryReducer", () => {
     expect(getCompareBImage(state)?.id).toBe("one");
   });
 
+  it("reorders images without changing selection or A/B roles", () => {
+    const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
+      type: "add",
+      images: [image("one"), image("two"), image("three")],
+    });
+    const state = imageLibraryReducer(initial, {
+      type: "reorder",
+      imageId: "one",
+      toIndex: 3,
+    });
+
+    expect(state.images.map(({ id }) => id)).toEqual(["two", "three", "one"]);
+    expect(state.selectedId).toBe(initial.selectedId);
+    expect(state.compareAId).toBe(initial.compareAId);
+    expect(state.compareBId).toBe(initial.compareBId);
+  });
+
   it("clears all images and roles", () => {
     const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
       type: "add",
@@ -112,6 +129,13 @@ describe("imageLibraryReducer", () => {
     ).toBe(initial);
     expect(
       imageLibraryReducer(initial, { type: "set-b", imageId: "missing" }),
+    ).toBe(initial);
+    expect(
+      imageLibraryReducer(initial, {
+        type: "reorder",
+        imageId: "missing",
+        toIndex: 0,
+      }),
     ).toBe(initial);
   });
 });

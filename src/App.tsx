@@ -54,6 +54,7 @@ function App() {
     selectImage,
     setAsImageA,
     setAsImageB,
+    reorderImage,
     deleteImage,
     handleImageLoadError,
     clearImages,
@@ -459,6 +460,7 @@ function App() {
           onSelect={selectImageWithReset}
           onSetAsA={setAsImageA}
           onSetAsB={setAsImageB}
+          onReorder={reorderImage}
           onDelete={deleteImage}
           onImageLoadError={handleImageLoadError}
         />
@@ -506,6 +508,7 @@ function App() {
                   <SingleImageView
                     image={selectedImage}
                     showFileName={showFileNames}
+                    rotation={rotation}
                     transform={`translate(${pan.x}px, ${pan.y}px) scale(${
                       zoom / 100
                     }) rotate(${rotation}deg)`}

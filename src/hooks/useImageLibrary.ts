@@ -108,6 +108,11 @@ export function useImageLibrary() {
     (imageId: string) => applyAction({ type: "set-b", imageId }),
     [applyAction],
   );
+  const reorderImage = useCallback(
+    (imageId: string, toIndex: number) =>
+      applyAction({ type: "reorder", imageId, toIndex }),
+    [applyAction],
+  );
 
   const deleteImage = useCallback(
     (imageId: string) => {
@@ -156,6 +161,7 @@ export function useImageLibrary() {
     selectImage,
     setAsImageA,
     setAsImageB,
+    reorderImage,
     deleteImage,
     handleImageLoadError,
     clearImages,

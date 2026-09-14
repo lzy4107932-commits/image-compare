@@ -20,6 +20,7 @@ describe("SingleImageView", () => {
       <SingleImageView
         image={image}
         showFileName={true}
+        rotation={0}
         transform="translate(0px, 0px) scale(1) rotate(0deg)"
       />,
     );
@@ -37,11 +38,29 @@ describe("SingleImageView", () => {
       <SingleImageView
         image={image}
         showFileName={false}
+        rotation={0}
         transform="translate(0px, 0px) scale(1) rotate(0deg)"
       />,
     );
 
     expect(screen.queryByTitle(image.name)).toBeNull();
     expect(screen.getByRole("img", { name: image.name })).toBeDefined();
+  });
+
+  it("swaps the fit constraints for quarter-turn rotations", () => {
+    render(
+      <SingleImageView
+        image={image}
+        showFileName={true}
+        rotation={90}
+        transform="translate(0px, 0px) scale(1) rotate(90deg)"
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("img", { name: image.name })
+        .classList.contains("is-quarter-turn"),
+    ).toBe(true);
   });
 });

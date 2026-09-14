@@ -1,4 +1,5 @@
-import { Image as ImageIcon, Trash2 } from "lucide-react";
+import { useState, type DragEvent, type KeyboardEvent } from "react";
+import { GripVertical, Image as ImageIcon, Trash2 } from "lucide-react";
 import type { LocalImage } from "../types";
 import { useI18n } from "../useI18n";
 
@@ -10,6 +11,7 @@ type Props = {
   onSelect: (imageId: string) => void;
   onSetAsA: (imageId: string) => void;
   onSetAsB: (imageId: string) => void;
+  onReorder: (imageId: string, toIndex: number) => void;
   onDelete: (imageId: string) => void;
   onImageLoadError: (imageId: string) => void;
 };
@@ -22,10 +24,90 @@ export default function ImageSidebar({
   onSelect,
   onSetAsA,
   onSetAsB,
+  onReorder,
   onDelete,
   onImageLoadError,
 }: Props) {
   const { t } = useI18n();
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<{
+    imageId: string;
+    insertionIndex: number;
+    edge: "before" | "after";
+  } | null>(null);
+
+  function clearDragState() {
+    setDraggedImageId(null);
+    setDropTarget(null);
+  }
+
+  function handleDragStart(event: DragEvent<HTMLButtonElement>, imageId: string) {
+    setDraggedImageId(imageId);
+    setDropTarget(null);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", imageId);
+  }
+
+  function handleDragOver(
+    event: DragEvent<HTMLDivElement>,
+    imageId: string,
+    index: number,
+  ) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+
+    if (draggedImageId === imageId) {
+      setDropTarget(null);
+      return;
+    }
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const edge = event.clientY < bounds.top + bounds.height / 2
+      ? "before"
+      : "after";
+
+    setDropTarget({
+      imageId,
+      insertionIndex: index + (edge === "after" ? 1 : 0),
+      edge,
+    });
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    const imageId = draggedImageId || event.dataTransfer.getData("text/plain");
+
+    if (imageId && dropTarget) {
+      onReorder(imageId, dropTarget.insertionIndex);
+    }
+
+    clearDragState();
+  }
+
+  function handleReorderKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    imageId: string,
+    index: number,
+  ) {
+    let toIndex: number | null = null;
+
+    if (event.key === "ArrowUp" && index > 0) {
+      toIndex = index - 1;
+    } else if (event.key === "ArrowDown" && index < images.length - 1) {
+      toIndex = index + 2;
+    } else if (event.key === "Home" && index > 0) {
+      toIndex = 0;
+    } else if (event.key === "End" && index < images.length - 1) {
+      toIndex = images.length;
+    }
+
+    if (toIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    onReorder(imageId, toIndex);
+  }
 
   return (
     <aside className="sidebar">
@@ -52,12 +134,34 @@ export default function ImageSidebar({
             return (
               <div
                 key={image.id}
-                className={
-                  selectedImageId === image.id
-                    ? "image-item selected"
-                    : "image-item"
-                }
+                className={[
+                  "image-item",
+                  selectedImageId === image.id ? "selected" : "",
+                  draggedImageId === image.id ? "is-dragging" : "",
+                  dropTarget?.imageId === image.id
+                    ? `is-drop-${dropTarget.edge}`
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onDragOver={(event) => handleDragOver(event, image.id, index)}
+                onDrop={handleDrop}
               >
+                <button
+                  type="button"
+                  className="image-reorder-handle"
+                  draggable
+                  title={`${t("reorderImage")}: ${image.name}`}
+                  aria-label={`${t("reorderImage")}: ${image.name}. ${t("reorderImageHint")}`}
+                  onDragStart={(event) => handleDragStart(event, image.id)}
+                  onDragEnd={clearDragState}
+                  onKeyDown={(event) =>
+                    handleReorderKeyDown(event, image.id, index)
+                  }
+                >
+                  <GripVertical size={15} />
+                </button>
+
                 <button
                   type="button"
                   className="image-item-select"
@@ -70,6 +174,7 @@ export default function ImageSidebar({
                     alt={image.name}
                     loading="lazy"
                     decoding="async"
+                    draggable={false}
                     onError={() => onImageLoadError(image.id)}
                   />
 

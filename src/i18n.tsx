@@ -29,6 +29,8 @@ const translations = {
     showFileNames: "显示文件名",
     hideFileNames: "隐藏文件名",
     fileNames: "文件名",
+    reorderImage: "调整图片顺序",
+    reorderImageHint: "拖动排序，或使用方向键移动",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -159,6 +161,8 @@ const translations = {
     showFileNames: "Show file names",
     hideFileNames: "Hide file names",
     fileNames: "File names",
+    reorderImage: "Reorder image",
+    reorderImageHint: "Drag to reorder, or use arrow keys to move",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

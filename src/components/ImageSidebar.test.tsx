@@ -21,6 +21,7 @@ function renderSidebar(overrides: Partial<Parameters<typeof ImageSidebar>[0]> = 
     onSelect: vi.fn(),
     onSetAsA: vi.fn(),
     onSetAsB: vi.fn(),
+    onReorder: vi.fn(),
     onDelete: vi.fn(),
     onImageLoadError: vi.fn(),
     ...overrides,
@@ -82,5 +83,47 @@ describe("ImageSidebar", () => {
     fireEvent.error(thumbnail);
 
     expect(props.onImageLoadError).toHaveBeenCalledWith("one");
+  });
+
+  it("reorders an image with the keyboard-accessible drag handle", () => {
+    const props = renderSidebar();
+    const handle = screen.getByRole("button", {
+      name: /Reorder image: second\.png/,
+    });
+
+    fireEvent.keyDown(handle, { key: "ArrowUp" });
+
+    expect(props.onReorder).toHaveBeenCalledWith("two", 0);
+  });
+
+  it("drops an image after the pointed list item", () => {
+    const props = renderSidebar();
+    const sourceHandle = screen.getByRole("button", {
+      name: /Reorder image: first\.png/,
+    });
+    const targetItem = screen
+      .getByRole("button", { name: "Select image: second.png" })
+      .closest<HTMLElement>(".image-item");
+    const dataTransfer = {
+      effectAllowed: "none",
+      dropEffect: "none",
+      setData: vi.fn(),
+      getData: vi.fn(() => "one"),
+    };
+
+    expect(targetItem).not.toBeNull();
+    vi.spyOn(targetItem as HTMLElement, "getBoundingClientRect").mockReturnValue({
+      top: 0,
+      height: 88,
+    } as DOMRect);
+
+    fireEvent.dragStart(sourceHandle, { dataTransfer });
+    fireEvent.dragOver(targetItem as HTMLElement, {
+      clientY: 80,
+      dataTransfer,
+    });
+    fireEvent.drop(targetItem as HTMLElement, { dataTransfer });
+
+    expect(props.onReorder).toHaveBeenCalledWith("one", 2);
   });
 });
