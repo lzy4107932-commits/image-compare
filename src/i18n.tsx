@@ -33,6 +33,8 @@ const translations = {
     reorderImageHint: "拖动排序，或使用方向键移动",
     reorderComplete: "排序完成",
     listPosition: "位置",
+    undoReorder: "撤销排序",
+    reorderUndone: "已撤销上一次排序",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -167,6 +169,8 @@ const translations = {
     reorderImageHint: "Drag to reorder, or use arrow keys to move",
     reorderComplete: "Reorder complete",
     listPosition: "position",
+    undoReorder: "Undo reorder",
+    reorderUndone: "Last reorder undone",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

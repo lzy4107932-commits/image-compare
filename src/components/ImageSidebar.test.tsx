@@ -22,6 +22,8 @@ function renderSidebar(overrides: Partial<Parameters<typeof ImageSidebar>[0]> = 
     onSetAsA: vi.fn(),
     onSetAsB: vi.fn(),
     onReorder: vi.fn(),
+    onUndoReorder: vi.fn(),
+    canUndoReorder: false,
     onDelete: vi.fn(),
     onImageLoadError: vi.fn(),
     ...overrides,
@@ -83,6 +85,18 @@ describe("ImageSidebar", () => {
     fireEvent.error(thumbnail);
 
     expect(props.onImageLoadError).toHaveBeenCalledWith("one");
+  });
+
+  it("undoes the most recent reorder when history is available", async () => {
+    const user = userEvent.setup();
+    const props = renderSidebar({ canUndoReorder: true });
+
+    await user.click(screen.getByRole("button", { name: "Undo reorder" }));
+
+    expect(props.onUndoReorder).toHaveBeenCalledOnce();
+    expect(screen.getByRole("status").textContent).toBe(
+      "Last reorder undone",
+    );
   });
 
   it("reorders an image with the keyboard-accessible drag handle", () => {

@@ -1,5 +1,10 @@
 import { useState, type DragEvent, type KeyboardEvent } from "react";
-import { GripVertical, Image as ImageIcon, Trash2 } from "lucide-react";
+import {
+  GripVertical,
+  Image as ImageIcon,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import type { LocalImage } from "../types";
 import { useI18n } from "../useI18n";
 import { getDragAutoScrollAmount } from "../utils/sidebarReorder";
@@ -13,6 +18,8 @@ type Props = {
   onSetAsA: (imageId: string) => void;
   onSetAsB: (imageId: string) => void;
   onReorder: (imageId: string, toIndex: number) => void;
+  onUndoReorder: () => void;
+  canUndoReorder: boolean;
   onDelete: (imageId: string) => void;
   onImageLoadError: (imageId: string) => void;
 };
@@ -26,6 +33,8 @@ export default function ImageSidebar({
   onSetAsA,
   onSetAsB,
   onReorder,
+  onUndoReorder,
+  canUndoReorder,
   onDelete,
   onImageLoadError,
 }: Props) {
@@ -59,6 +68,11 @@ export default function ImageSidebar({
     setReorderAnnouncement(
       `${t("reorderComplete")}: ${image.name}, ${t("listPosition")} ${finalIndex + 1}`,
     );
+  }
+
+  function handleUndoReorder() {
+    onUndoReorder();
+    setReorderAnnouncement(t("reorderUndone"));
   }
 
   function handleDragStart(event: DragEvent<HTMLButtonElement>, imageId: string) {
@@ -158,6 +172,17 @@ export default function ImageSidebar({
             {images.length} {t("imagesUnit")}
           </span>
         </div>
+        <button
+          type="button"
+          className="undo-reorder-button"
+          title={t("undoReorder")}
+          aria-label={t("undoReorder")}
+          disabled={!canUndoReorder}
+          onClick={handleUndoReorder}
+        >
+          <Undo2 size={15} />
+          <span>{t("undoReorder")}</span>
+        </button>
       </div>
 
       <div className="image-list" onDragOver={handleListDragOver}>

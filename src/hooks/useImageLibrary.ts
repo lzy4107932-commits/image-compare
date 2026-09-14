@@ -28,6 +28,8 @@ export function useImageLibrary() {
     INITIAL_IMAGE_LIBRARY_STATE,
   );
   const [importNotice, setImportNotice] = useState<string | null>(null);
+  const previousOrderRef = useRef<string[] | null>(null);
+  const [canUndoReorder, setCanUndoReorder] = useState(false);
 
   const applyAction = useCallback((action: ImageLibraryAction) => {
     const nextState = imageLibraryReducer(stateRef.current, action);
@@ -91,6 +93,8 @@ export function useImageLibrary() {
         size: file.size,
       }));
 
+      previousOrderRef.current = null;
+      setCanUndoReorder(false);
       applyAction({ type: "add", images });
     },
     [applyAction, t],
@@ -109,10 +113,42 @@ export function useImageLibrary() {
     [applyAction],
   );
   const reorderImage = useCallback(
-    (imageId: string, toIndex: number) =>
-      applyAction({ type: "reorder", imageId, toIndex }),
+    (imageId: string, toIndex: number) => {
+      const currentImages = stateRef.current.images;
+      const fromIndex = currentImages.findIndex((image) => image.id === imageId);
+
+      if (fromIndex < 0) {
+        return;
+      }
+
+      const insertionIndex = Math.min(
+        currentImages.length,
+        Math.max(0, toIndex),
+      );
+      const finalIndex =
+        fromIndex < insertionIndex ? insertionIndex - 1 : insertionIndex;
+
+      if (finalIndex === fromIndex) {
+        return;
+      }
+
+      previousOrderRef.current = currentImages.map((image) => image.id);
+      setCanUndoReorder(true);
+      applyAction({ type: "reorder", imageId, toIndex });
+    },
     [applyAction],
   );
+  const undoReorder = useCallback(() => {
+    const imageIds = previousOrderRef.current;
+
+    if (!imageIds) {
+      return;
+    }
+
+    applyAction({ type: "restore-order", imageIds });
+    previousOrderRef.current = null;
+    setCanUndoReorder(false);
+  }, [applyAction]);
 
   const deleteImage = useCallback(
     (imageId: string) => {
@@ -124,6 +160,8 @@ export function useImageLibrary() {
         return;
       }
 
+      previousOrderRef.current = null;
+      setCanUndoReorder(false);
       URL.revokeObjectURL(target.url);
       applyAction({ type: "delete", imageId });
     },
@@ -147,6 +185,8 @@ export function useImageLibrary() {
       URL.revokeObjectURL(image.url);
     });
     applyAction({ type: "clear" });
+    previousOrderRef.current = null;
+    setCanUndoReorder(false);
     setImportNotice(null);
   }, [applyAction]);
 
@@ -162,6 +202,8 @@ export function useImageLibrary() {
     setAsImageA,
     setAsImageB,
     reorderImage,
+    undoReorder,
+    canUndoReorder,
     deleteImage,
     handleImageLoadError,
     clearImages,

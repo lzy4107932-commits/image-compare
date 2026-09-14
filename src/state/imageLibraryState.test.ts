@@ -101,6 +101,31 @@ describe("imageLibraryReducer", () => {
     expect(state.compareBId).toBe(initial.compareBId);
   });
 
+  it("restores a complete previous image order", () => {
+    const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
+      type: "add",
+      images: [image("one"), image("two"), image("three")],
+    });
+    const reordered = imageLibraryReducer(initial, {
+      type: "reorder",
+      imageId: "one",
+      toIndex: 3,
+    });
+    const restored = imageLibraryReducer(reordered, {
+      type: "restore-order",
+      imageIds: ["one", "two", "three"],
+    });
+
+    expect(restored.images.map(({ id }) => id)).toEqual([
+      "one",
+      "two",
+      "three",
+    ]);
+    expect(restored.selectedId).toBe(initial.selectedId);
+    expect(restored.compareAId).toBe(initial.compareAId);
+    expect(restored.compareBId).toBe(initial.compareBId);
+  });
+
   it("clears all images and roles", () => {
     const initial = imageLibraryReducer(INITIAL_IMAGE_LIBRARY_STATE, {
       type: "add",

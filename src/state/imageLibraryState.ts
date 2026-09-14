@@ -13,6 +13,7 @@ export type ImageLibraryAction =
   | { type: "set-a"; imageId: string }
   | { type: "set-b"; imageId: string }
   | { type: "reorder"; imageId: string; toIndex: number }
+  | { type: "restore-order"; imageIds: string[] }
   | { type: "delete"; imageId: string }
   | { type: "clear" };
 
@@ -136,6 +137,26 @@ export function imageLibraryReducer(
       nextImages.splice(adjustedIndex, 0, state.images[fromIndex]);
 
       return { ...state, images: nextImages };
+    }
+
+    case "restore-order": {
+      if (
+        action.imageIds.length !== state.images.length ||
+        new Set(action.imageIds).size !== state.images.length
+      ) {
+        return state;
+      }
+
+      const imagesById = new Map(
+        state.images.map((image) => [image.id, image] as const),
+      );
+      const images = action.imageIds.map((imageId) => imagesById.get(imageId));
+
+      if (images.some((image) => !image)) {
+        return state;
+      }
+
+      return { ...state, images: images as LocalImage[] };
     }
 
     case "delete": {

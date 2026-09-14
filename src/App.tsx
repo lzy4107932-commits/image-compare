@@ -55,6 +55,8 @@ function App() {
     setAsImageA,
     setAsImageB,
     reorderImage,
+    undoReorder,
+    canUndoReorder,
     deleteImage,
     handleImageLoadError,
     clearImages,
@@ -461,6 +463,8 @@ function App() {
           onSetAsA={setAsImageA}
           onSetAsB={setAsImageB}
           onReorder={reorderImage}
+          onUndoReorder={undoReorder}
+          canUndoReorder={canUndoReorder}
           onDelete={deleteImage}
           onImageLoadError={handleImageLoadError}
         />
