@@ -1,10 +1,19 @@
-import { useState, type DragEvent, type KeyboardEvent } from "react";
 import {
+  useEffect,
+  useRef,
+  useState,
+  type DragEvent,
+  type KeyboardEvent,
+} from "react";
+import {
+  Crosshair,
   GripVertical,
   Image as ImageIcon,
   RotateCcw,
+  Search,
   Trash2,
   Undo2,
+  X,
 } from "lucide-react";
 import type { LocalImage } from "../types";
 import { useI18n } from "../useI18n";
@@ -44,6 +53,7 @@ export default function ImageSidebar({
   onImageLoadError,
 }: Props) {
   const { t } = useI18n();
+  const [filterQuery, setFilterQuery] = useState("");
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [reorderAnnouncement, setReorderAnnouncement] = useState("");
   const [dropTarget, setDropTarget] = useState<{
@@ -51,6 +61,25 @@ export default function ImageSidebar({
     insertionIndex: number;
     edge: "before" | "after";
   } | null>(null);
+  const itemRefs = useRef(new Map<string, HTMLDivElement>());
+  const normalizedFilter = filterQuery.trim().toLocaleLowerCase();
+  const visibleImages = normalizedFilter
+    ? images.filter((image) =>
+        image.name.toLocaleLowerCase().includes(normalizedFilter),
+      )
+    : images;
+
+  useEffect(() => {
+    if (!selectedImageId) {
+      return;
+    }
+
+    const selectedItem = itemRefs.current.get(selectedImageId);
+
+    if (typeof selectedItem?.scrollIntoView === "function") {
+      selectedItem.scrollIntoView({ block: "nearest", behavior: "auto" });
+    }
+  }, [normalizedFilter, selectedImageId]);
 
   function clearDragState() {
     setDraggedImageId(null);
@@ -83,6 +112,21 @@ export default function ImageSidebar({
   function handleRestoreImportOrder() {
     onRestoreImportOrder();
     setReorderAnnouncement(t("importOrderRestored"));
+  }
+
+  function locateCurrentImage() {
+    if (filterQuery) {
+      setFilterQuery("");
+      return;
+    }
+
+    if (selectedImageId) {
+      const selectedItem = itemRefs.current.get(selectedImageId);
+
+      if (typeof selectedItem?.scrollIntoView === "function") {
+        selectedItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    }
   }
 
   function handleDragStart(event: DragEvent<HTMLButtonElement>, imageId: string) {
@@ -208,20 +252,66 @@ export default function ImageSidebar({
         </div>
       </div>
 
+      <div className="sidebar-filter" role="search">
+        <Search size={14} aria-hidden="true" />
+        <input
+          type="search"
+          value={filterQuery}
+          aria-label={t("filterImages")}
+          placeholder={t("filterImagesPlaceholder")}
+          disabled={images.length === 0}
+          onChange={(event) => setFilterQuery(event.target.value)}
+        />
+        {filterQuery && (
+          <button
+            type="button"
+            className="sidebar-filter-action"
+            title={t("clearFilter")}
+            aria-label={t("clearFilter")}
+            onClick={() => setFilterQuery("")}
+          >
+            <X size={14} />
+          </button>
+        )}
+        <button
+          type="button"
+          className="sidebar-filter-action"
+          title={t("locateCurrentImage")}
+          aria-label={t("locateCurrentImage")}
+          disabled={!selectedImageId}
+          onClick={locateCurrentImage}
+        >
+          <Crosshair size={14} />
+        </button>
+      </div>
+
       <div className="image-list" onDragOver={handleListDragOver}>
         {images.length === 0 ? (
           <div className="sidebar-empty">
             <ImageIcon size={32} />
             <span>{t("noImagesImported")}</span>
           </div>
+        ) : visibleImages.length === 0 ? (
+          <div className="sidebar-empty sidebar-filter-empty">
+            <Search size={28} />
+            <span>{t("noMatchingImages")}</span>
+          </div>
         ) : (
-          images.map((image, index) => {
+          visibleImages.map((image) => {
+            const index = images.findIndex(({ id }) => id === image.id);
             const isImageA = compareAId === image.id;
             const isImageB = compareBId === image.id;
 
             return (
               <div
                 key={image.id}
+                ref={(node) => {
+                  if (node) {
+                    itemRefs.current.set(image.id, node);
+                  } else {
+                    itemRefs.current.delete(image.id);
+                  }
+                }}
                 className={[
                   "image-item",
                   selectedImageId === image.id ? "selected" : "",

@@ -39,6 +39,11 @@ const translations = {
     importOrderRestored: "已恢复最初导入顺序",
     undoShort: "撤销",
     originalOrderShort: "原始顺序",
+    filterImages: "筛选图片",
+    filterImagesPlaceholder: "按文件名筛选",
+    clearFilter: "清除筛选",
+    locateCurrentImage: "定位当前图片",
+    noMatchingImages: "没有匹配的图片",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -179,6 +184,11 @@ const translations = {
     importOrderRestored: "Original import order restored",
     undoShort: "Undo",
     originalOrderShort: "Original",
+    filterImages: "Filter images",
+    filterImagesPlaceholder: "Filter by file name",
+    clearFilter: "Clear filter",
+    locateCurrentImage: "Locate current image",
+    noMatchingImages: "No matching images",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

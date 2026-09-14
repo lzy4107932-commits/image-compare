@@ -89,6 +89,30 @@ describe("ImageSidebar", () => {
     expect(props.onImageLoadError).toHaveBeenCalledWith("one");
   });
 
+  it("filters by file name and locates the selected image", async () => {
+    const user = userEvent.setup();
+    renderSidebar();
+    const filter = screen.getByRole("searchbox", { name: "Filter images" });
+
+    await user.type(filter, "second");
+
+    expect(
+      screen.queryByRole("button", { name: "Select image: first.png" }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Select image: second.png" }),
+    ).toBeDefined();
+
+    await user.click(
+      screen.getByRole("button", { name: "Locate current image" }),
+    );
+
+    expect((filter as HTMLInputElement).value).toBe("");
+    expect(
+      screen.getByRole("button", { name: "Select image: first.png" }),
+    ).toBeDefined();
+  });
+
   it("undoes the most recent reorder when history is available", async () => {
     const user = userEvent.setup();
     const props = renderSidebar({ canUndoReorder: true });
