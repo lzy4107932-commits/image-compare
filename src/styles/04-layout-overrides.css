@@ -33,11 +33,10 @@
 /*
  * 底部状态栏保持单行显示。
  *
- * 四个区域分别为：
+ * 三个区域分别为：
  * 1. 图片总数
- * 2. 当前文件名或 A/B 文件名
- * 3. 快捷键操作提示
- * 4. 当前模式、缩放和旋转信息
+ * 2. 快捷键操作提示
+ * 3. 当前模式、缩放和旋转信息
  */
 .statusbar {
   width: 100%;
@@ -103,6 +102,12 @@
 .statusbar-meta {
   color: var(--theme-muted);
   text-align: right;
+}
+
+/* 按查看器可用宽度响应，而不是按包含侧边栏的整窗宽度响应。 */
+.viewer {
+  container-name: image-viewer;
+  container-type: inline-size;
 }
 
 /*
@@ -690,24 +695,74 @@
   }
 }
 
-@media (max-width: 980px) {
-  /*
-   * 特别窄时允许整条工具栏横向滚动，
-   * 仍然不允许功能按钮上下换行。
-   */
+@container image-viewer (max-width: 980px) {
+  /* 空间不足时将 A/B 的模式区和变换区分成两行。 */
   .viewer-toolbar:has(.ab-toolbar-portal-center) {
-    grid-template-columns: max-content max-content;
+    height: 94px;
+    min-height: 94px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 43px 43px;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-center {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-center {
-    width: max-content;
-    overflow: visible;
+  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-actions {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
-  .viewer-toolbar:has(.ab-toolbar-portal-center) > .viewer-toolbar-actions {
-    overflow: visible;
+  .viewer-toolbar-actions .ab-transform-controls {
+    min-width: max-content;
+  }
+
+  /* 状态栏优先保留操作提示和当前变换信息。 */
+  .statusbar {
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+
+  .statusbar-count {
+    display: none;
+  }
+
+  .statusbar-help {
+    border-left: 0;
+    text-align: left;
+  }
+
+  .statusbar-meta {
+    max-width: 220px;
+  }
+}
+
+@container image-viewer (max-width: 620px) {
+  .statusbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .statusbar-help {
+    padding: 0;
+    border-right: 0;
+    text-align: center;
+  }
+
+  .statusbar-meta {
+    display: none;
   }
 }
 /* 多图视图右上角摘要 */
