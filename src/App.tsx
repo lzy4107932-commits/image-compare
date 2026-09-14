@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   ChangeEvent,
   DragEvent,
@@ -9,23 +9,14 @@ import AppHeader from "./components/AppHeader";
 import EmptyState from "./components/EmptyState";
 import ImageSidebar from "./components/ImageSidebar";
 import ImportNotice from "./components/ImportNotice";
+import StatusBar from "./components/StatusBar";
+import ViewerToolbar from "./components/ViewerToolbar";
+import { useImageLibrary } from "./hooks/useImageLibrary";
 import { useI18n } from "./useI18n";
-import {
-  MAX_IMAGE_COUNT,
-  MAX_IMAGE_FILE_MIB,
-  selectImportableImages,
-} from "./utils/imageImport";
-import {
-  Grid3X3,
-  Image as ImageIcon,
-  Maximize,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
 import "./App.css";
 import MultiCompareView from "./components/MultiCompareView";
 import ABCompareView from "./components/ABCompareView";
-import type { LocalImage, Theme, ViewMode } from "./types";
+import type { Theme, ViewMode } from "./types";
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -46,17 +37,28 @@ function App() {
     localStorage.setItem("image-compare-theme", theme);
   }, [theme]);
   const canvasRef = useRef<HTMLDivElement>(null);
-  const imagesRef = useRef<LocalImage[]>([]);
-  const [images, setImages] = useState<LocalImage[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [compareAId, setCompareAId] = useState<string | null>(null);
-  const [compareBId, setCompareBId] = useState<string | null>(null);
+  const imageLibrary = useImageLibrary();
+  const {
+    images,
+    selectedId,
+    selectedImage,
+    compareAImage,
+    compareBImage,
+    importNotice,
+    addImageFiles,
+    selectImage,
+    setAsImageA,
+    setAsImageB,
+    deleteImage,
+    handleImageLoadError,
+    clearImages,
+    dismissImportNotice,
+  } = imageLibrary;
   const [viewMode, setViewMode] = useState<ViewMode>("single");
   const { t } = useI18n();
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [compareHelp, setCompareHelp] = useState("");
-  const [importNotice, setImportNotice] = useState<string | null>(null);
 
   /*
    * A/BCompareView 内部保存着“同步 / 调整 A / 调整 B”状态，
@@ -98,28 +100,6 @@ function App() {
     panX: 0,
     panY: 0,
   });
-  /*
-   * 始终保存最新的图片列表。
-   * 这样组件卸载时可以释放当前仍然存在的对象 URL。
-   */
-  useEffect(() => {
-    imagesRef.current = images;
-  }, [images]);
-
-  /*
-   * 页面关闭、刷新或 App 组件卸载时，
-   * 释放所有尚未释放的本地图片对象 URL。
-   */
-  useEffect(() => {
-    return () => {
-      imagesRef.current.forEach((image) => {
-        URL.revokeObjectURL(image.url);
-      });
-
-      imagesRef.current = [];
-    };
-  }, []);
-
   useEffect(() => {
     function handleWindowKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
@@ -206,7 +186,7 @@ function App() {
         const previousIndex =
           currentIndex <= 0 ? images.length - 1 : currentIndex - 1;
 
-        setSelectedId(images[previousIndex].id);
+        selectImage(images[previousIndex].id);
         return;
       }
 
@@ -215,7 +195,7 @@ function App() {
           ? 0
           : currentIndex + 1;
 
-      setSelectedId(images[nextIndex].id);
+      selectImage(images[nextIndex].id);
     }
 
     window.addEventListener("keydown", handleWindowKeyDown);
@@ -223,80 +203,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleWindowKeyDown);
     };
-  }, [images, selectedId, viewMode]);
-
-  const selectedImage = useMemo(() => {
-    return images.find((image) => image.id === selectedId) ?? images[0] ?? null;
-  }, [images, selectedId]);
-
-  const compareAImage = useMemo(() => {
-    return images.find((image) => image.id === compareAId) ?? images[0] ?? null;
-  }, [images, compareAId]);
-
-  const compareBImage = useMemo(() => {
-    const savedImage = images.find(
-      (image) => image.id === compareBId && image.id !== compareAImage?.id,
-    );
-
-    if (savedImage) {
-      return savedImage;
-    }
-
-    return images.find((image) => image.id !== compareAImage?.id) ?? null;
-  }, [images, compareBId, compareAImage]);
-
-  function addImageFiles(fileList: FileList | File[]) {
-    const files = Array.from(fileList);
-
-    const selection = selectImportableImages(files, imagesRef.current.length);
-    const notices: string[] = [];
-
-    if (selection.rejectedType > 0) {
-      notices.push(`${t("unsupportedImagesSkipped")}: ${selection.rejectedType}`);
-    }
-
-    if (selection.rejectedSize > 0) {
-      notices.push(
-        `${t("oversizedImagesSkipped")} (${MAX_IMAGE_FILE_MIB} MiB): ${selection.rejectedSize}`,
-      );
-    }
-
-    if (selection.rejectedCount > 0) {
-      notices.push(
-        `${t("imageCountLimitReached")} (${MAX_IMAGE_COUNT}): ${selection.rejectedCount}`,
-      );
-    }
-
-    setImportNotice(notices.length > 0 ? notices.join(" · ") : null);
-
-    if (selection.accepted.length === 0) {
-      return;
-    }
-
-    const currentTime = Date.now();
-
-    const newImages: LocalImage[] = selection.accepted.map((file, index) => ({
-      id: `${currentTime}-${index}-${file.name}`,
-      name: file.name,
-      url: URL.createObjectURL(file),
-    }));
-
-    const nextImages = [...imagesRef.current, ...newImages];
-    imagesRef.current = nextImages;
-    setImages(nextImages);
-
-    if (!selectedId && newImages[0]) {
-      setSelectedId(newImages[0].id);
-    }
-
-    if (!compareAId && newImages[0]) {
-      setCompareAId(newImages[0].id);
-    }
-
-    if (!compareBId && newImages[1]) {
-      setCompareBId(newImages[1].id);
-    }
-  }
+  }, [images, selectImage, selectedId, viewMode]);
 
   function handleImport(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.files) {
@@ -339,74 +246,8 @@ function App() {
     }
   }
 
-  function setAsImageA(imageId: string) {
-    if (imageId === compareBImage?.id) {
-      setCompareBId(compareAImage?.id ?? null);
-    }
-
-    setCompareAId(imageId);
-  }
-
-  function setAsImageB(imageId: string) {
-    if (imageId === compareAImage?.id) {
-      setCompareAId(compareBImage?.id ?? null);
-    }
-
-    setCompareBId(imageId);
-  }
-
-  function handleDelete(imageId: string) {
-    const currentImages = imagesRef.current;
-    const target = currentImages.find((image) => image.id === imageId);
-
-    if (target) {
-      URL.revokeObjectURL(target.url);
-    }
-
-    const nextImages = currentImages.filter((image) => image.id !== imageId);
-
-    imagesRef.current = nextImages;
-    setImages(nextImages);
-
-    if (selectedImage?.id === imageId) {
-      setSelectedId(nextImages[0]?.id ?? null);
-    }
-
-    if (compareAImage?.id === imageId) {
-      const nextA = nextImages[0] ?? null;
-      setCompareAId(nextA?.id ?? null);
-    }
-
-    if (compareBImage?.id === imageId) {
-      const nextB =
-        nextImages.find((image) => image.id !== compareAImage?.id) ??
-        nextImages[1] ??
-        null;
-
-      setCompareBId(nextB?.id ?? null);
-    }
-  }
-
-  function handleImageLoadError(imageId: string) {
-    if (!imagesRef.current.some((image) => image.id === imageId)) {
-      return;
-    }
-
-    setImportNotice(t("imageLoadFailed"));
-    handleDelete(imageId);
-  }
-
   function handleClear() {
-    images.forEach((image) => {
-      URL.revokeObjectURL(image.url);
-    });
-
-    imagesRef.current = [];
-
-    setImages([]);
-    setSelectedId(null);
-    setCompareAId(null);
-    setCompareBId(null);
+    clearImages();
     setZoom(100);
     setRotation(0);
     setPan({
@@ -414,7 +255,6 @@ function App() {
       y: 0,
     });
     setIsPanning(false);
-    setImportNotice(null);
   }
 
   function zoomIn() {
@@ -605,7 +445,7 @@ function App() {
 
       <ImportNotice
         message={importNotice}
-        onDismiss={() => setImportNotice(null)}
+        onDismiss={dismissImportNotice}
       />
 
       <div className="workspace">
@@ -614,92 +454,22 @@ function App() {
           selectedImageId={selectedImage?.id ?? null}
           compareAId={compareAImage?.id ?? null}
           compareBId={compareBImage?.id ?? null}
-          onSelect={setSelectedId}
+          onSelect={selectImage}
           onSetAsA={setAsImageA}
           onSetAsB={setAsImageB}
-          onDelete={handleDelete}
+          onDelete={deleteImage}
           onImageLoadError={handleImageLoadError}
         />
 
         <main className="viewer">
-          <div className="viewer-toolbar">
-            <div className="current-mode">
-              {viewMode === "single" && (
-                <>
-                  <ImageIcon size={17} />
-                  <span>{t("singleView")}</span>
-                </>
-              )}
-
-              {viewMode === "grid" && (
-                <>
-                  <Grid3X3 size={17} />
-                  <span>{t("gridView")}</span>
-                </>
-              )}
-            </div>
-            <div id="viewer-toolbar-center" className="viewer-toolbar-center" />
-
-            <div
-              id="viewer-toolbar-actions"
-              className="viewer-toolbar-actions"
-            />
-
-            <div
-              className={
-                viewMode === "single"
-                  ? "zoom-controls"
-                  : "zoom-controls grid-hidden-controls"
-              }
-            >
-              <button
-                type="button"
-                onClick={zoomOut}
-                title={t("zoomOut")}
-                aria-label={t("zoomOut")}
-              >
-                <ZoomOut size={18} />
-              </button>
-
-              <button
-                className="zoom-value"
-                onClick={resetZoom}
-                title={t("reset")}
-                aria-label={t("reset")}
-              >
-                {zoom}%
-              </button>
-
-              <button
-                type="button"
-                onClick={zoomIn}
-                title={t("zoomIn")}
-                aria-label={t("zoomIn")}
-              >
-                <ZoomIn size={18} />
-              </button>
-
-              {viewMode === "single" && (
-                <button
-                  type="button"
-                  onClick={handleRotateClockwise}
-                  title={`${t("rotateClockwise")} 90° (R)`}
-                  aria-label={`${t("rotateClockwise")} 90°`}
-                >
-                  ↻
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={resetZoom}
-                title={t("reset")}
-                aria-label={t("reset")}
-              >
-                <Maximize size={17} />
-              </button>
-            </div>
-          </div>
+          <ViewerToolbar
+            viewMode={viewMode}
+            zoom={zoom}
+            onZoomOut={zoomOut}
+            onZoomIn={zoomIn}
+            onReset={resetZoom}
+            onRotate={handleRotateClockwise}
+          />
 
           <div
             ref={canvasRef}
@@ -762,27 +532,13 @@ function App() {
             )}
           </div>
 
-          <footer className="statusbar">
-            <span className="statusbar-count">
-              {t("total")} {images.length} {t("imageUnit")}
-            </span>
-
-            <span className="statusbar-help" title={currentStatusHelp}>
-              {currentStatusHelp}
-            </span>
-
-            <span className="statusbar-meta">
-              {viewMode === "single" ? (
-                <>
-                  {rotation}° · {t("zoomLabel")}: {zoom}%
-                </>
-              ) : viewMode === "compare" ? (
-                t("compareView")
-              ) : (
-                t("gridModeDescription")
-              )}
-            </span>
-          </footer>
+          <StatusBar
+            imageCount={images.length}
+            viewMode={viewMode}
+            rotation={rotation}
+            zoom={zoom}
+            help={currentStatusHelp}
+          />
         </main>
       </div>
     </div>
