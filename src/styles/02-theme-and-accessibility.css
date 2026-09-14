@@ -1583,6 +1583,55 @@ button {
   outline-offset: 2px;
 }
 
+.fatal-error-screen {
+  min-height: 100vh;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  color: #d7dae0;
+  background: #111318;
+}
+
+.fatal-error-card {
+  width: min(520px, 100%);
+  padding: 32px;
+  border: 1px solid #353944;
+  border-radius: 16px;
+  background: #1b1d24;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 32%);
+  text-align: center;
+}
+
+.fatal-error-card h1 {
+  margin: 0 0 14px;
+  font-size: 22px;
+}
+
+.fatal-error-card p {
+  margin: 6px 0;
+  color: #aeb3be;
+  line-height: 1.55;
+}
+
+.fatal-error-card button {
+  margin-top: 22px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #665ee8;
+  cursor: pointer;
+}
+
+.fatal-error-card button:hover {
+  background: #7770ee;
+}
+
+.fatal-error-card button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
 /* ========================================
    手机宽度
    ======================================== */

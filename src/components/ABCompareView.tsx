@@ -58,6 +58,7 @@ type Props = {
   onHelpChange?: (help: string) => void;
   showFileNames: boolean;
   onToggleFileNames: () => void;
+  onImageLoadError?: (imageId: string) => void;
 };
 
 export default function ABCompareView({
@@ -66,6 +67,7 @@ export default function ABCompareView({
   onHelpChange,
   showFileNames,
   onToggleFileNames,
+  onImageLoadError,
 }: Props) {
   const { t } = useI18n();
 
@@ -665,6 +667,7 @@ export default function ABCompareView({
                   alt={imageA.name}
                   decoding="async"
                   draggable={false}
+                  onError={() => onImageLoadError?.(imageA.id)}
                   style={transformStyleA}
                 />
                 {showFileNames && (
@@ -690,6 +693,7 @@ export default function ABCompareView({
                   alt={imageB.name}
                   decoding="async"
                   draggable={false}
+                  onError={() => onImageLoadError?.(imageB.id)}
                   style={transformStyleB}
                 />
                 {showFileNames && (
@@ -713,6 +717,7 @@ export default function ABCompareView({
                 alt={imageA.name}
                 decoding="async"
                 draggable={false}
+                onError={() => onImageLoadError?.(imageA.id)}
                 style={transformStyleA}
               />
 
@@ -728,6 +733,7 @@ export default function ABCompareView({
                   alt={imageB.name}
                   decoding="async"
                   draggable={false}
+                  onError={() => onImageLoadError?.(imageB.id)}
                   style={transformStyleB}
                 />
               </div>

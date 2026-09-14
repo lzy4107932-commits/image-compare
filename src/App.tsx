@@ -517,6 +517,7 @@ function App() {
                     image={selectedImage}
                     showFileName={showFileNames}
                     rotation={rotation}
+                    onImageLoadError={handleImageLoadError}
                     transform={`translate(${pan.x}px, ${pan.y}px) scale(${
                       zoom / 100
                     }) rotate(${rotation}deg)`}
@@ -529,6 +530,7 @@ function App() {
                     imageB={compareBImage}
                     onHelpChange={setCompareHelp}
                     showFileNames={showFileNames}
+                    onImageLoadError={handleImageLoadError}
                     onToggleFileNames={() =>
                       setShowFileNames((current) => !current)
                     }
@@ -538,6 +540,7 @@ function App() {
                   <MultiCompareView
                     images={images}
                     showFileNames={showFileNames}
+                    onImageLoadError={handleImageLoadError}
                     onToggleFileNames={() =>
                       setShowFileNames((current) => !current)
                     }

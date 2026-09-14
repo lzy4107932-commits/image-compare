@@ -6,6 +6,7 @@ type Props = {
   showFileName: boolean;
   rotation: number;
   transform: string;
+  onImageLoadError?: (imageId: string) => void;
 };
 
 export default function SingleImageView({
@@ -13,6 +14,7 @@ export default function SingleImageView({
   showFileName,
   rotation,
   transform,
+  onImageLoadError,
 }: Props) {
   const isQuarterTurn = Math.abs(rotation % 180) === 90;
 
@@ -28,6 +30,7 @@ export default function SingleImageView({
         alt={image.name}
         decoding="async"
         draggable={false}
+        onError={() => onImageLoadError?.(image.id)}
         style={{ transform }}
       />
       {showFileName && (

@@ -43,12 +43,14 @@ type Props = {
   images: LocalImage[];
   showFileNames: boolean;
   onToggleFileNames: () => void;
+  onImageLoadError?: (imageId: string) => void;
 };
 
 export default function MultiCompareView({
   images,
   showFileNames,
   onToggleFileNames,
+  onImageLoadError,
 }: Props) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -549,6 +551,7 @@ export default function MultiCompareView({
                     loading="lazy"
                     decoding="async"
                     draggable={false}
+                    onError={() => onImageLoadError?.(image.id)}
                     style={{
                       transform: `translate(${finalTransform.x}px, ${finalTransform.y}px) scale(${finalTransform.zoom}) rotate(${finalTransform.rotation}deg)`,
                     }}

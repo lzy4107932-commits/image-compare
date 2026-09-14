@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LocalImage } from "../types";
 import SingleImageView from "./SingleImageView";
 
@@ -62,5 +62,22 @@ describe("SingleImageView", () => {
         .getByRole("img", { name: image.name })
         .classList.contains("is-quarter-turn"),
     ).toBe(true);
+  });
+
+  it("reports a decoding failure for the displayed image", () => {
+    const onImageLoadError = vi.fn();
+
+    render(
+      <SingleImageView
+        image={image}
+        showFileName={true}
+        rotation={0}
+        transform="translate(0px, 0px) scale(1) rotate(0deg)"
+        onImageLoadError={onImageLoadError}
+      />,
+    );
+
+    fireEvent.error(screen.getByRole("img", { name: image.name }));
+    expect(onImageLoadError).toHaveBeenCalledExactlyOnceWith(image.id);
   });
 });

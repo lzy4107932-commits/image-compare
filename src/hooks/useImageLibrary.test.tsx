@@ -55,6 +55,36 @@ describe("useImageLibrary object URL lifecycle", () => {
     expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:first");
   });
 
+  it("isolates an image that cannot be decoded and reports the failure", () => {
+    createObjectURL
+      .mockReturnValueOnce("blob:broken")
+      .mockReturnValueOnce("blob:healthy");
+    const { result } = renderHook(() => useImageLibrary(), {
+      wrapper: Wrapper,
+    });
+
+    act(() => {
+      result.current.addImageFiles([
+        new File(["broken"], "broken.png", { type: "image/png" }),
+        new File(["healthy"], "healthy.png", { type: "image/png" }),
+      ]);
+    });
+
+    const brokenId = result.current.images[0].id;
+    act(() => {
+      result.current.handleImageLoadError(brokenId);
+      result.current.handleImageLoadError(brokenId);
+    });
+
+    expect(result.current.images.map((image) => image.name)).toEqual([
+      "healthy.png",
+    ]);
+    expect(result.current.importNotice).toBe(
+      "The image could not be decoded and was removed",
+    );
+    expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith("blob:broken");
+  });
+
   it("releases every remaining object URL when the library unmounts", () => {
     createObjectURL
       .mockReturnValueOnce("blob:first")
