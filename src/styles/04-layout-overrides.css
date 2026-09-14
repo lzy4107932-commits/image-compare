@@ -1363,3 +1363,95 @@ button[aria-selected="true"]:not(:disabled) {
     padding-bottom: 0;
   }
 }
+
+/* ==================================================
+   查看器窄宽度工具栏自适应
+   优先保留文件名按钮文字和缩放数值
+   ================================================== */
+
+@container image-viewer (max-width: 900px) {
+  /* 单图和多图取消左右等宽占位，把剩余宽度全部交给操作区。 */
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center)) {
+    padding-right: 6px;
+    padding-left: 6px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center)) > .current-mode {
+    grid-column: 1;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .viewer-toolbar-center {
+    grid-column: 2;
+    justify-content: flex-end;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .viewer-toolbar-center::-webkit-scrollbar {
+    display: none;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .viewer-toolbar-actions {
+    display: none;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .zoom-controls:not(.grid-hidden-controls) {
+    grid-column: 2;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: stretch;
+    justify-content: flex-end;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .zoom-controls:not(.grid-hidden-controls)::-webkit-scrollbar {
+    display: none;
+  }
+
+  .multi-compare-toolbar-actions,
+  .zoom-controls {
+    flex-flow: row nowrap;
+  }
+
+  .multi-compare-toolbar-actions > button,
+  .zoom-controls > button {
+    flex: 0 0 auto;
+  }
+}
+
+@container image-viewer (max-width: 720px) {
+  /* 次要操作保留图标和完整 tooltip，避免压缩文件名按钮。 */
+  .transform-action-button > span {
+    display: none;
+  }
+
+  .zoom-controls .transform-action-button,
+  .multi-compare-toolbar-actions .transform-action-button,
+  .viewer-toolbar-actions .ab-transform-controls .transform-action-button {
+    min-width: 30px;
+    width: 30px;
+    padding-right: 6px;
+    padding-left: 6px;
+    gap: 0;
+  }
+
+  .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+    > .current-mode
+    span {
+    display: none;
+  }
+
+  .viewer-toolbar-actions .ab-transform-controls {
+    padding-right: 2px;
+    padding-left: 2px;
+    gap: 2px;
+  }
+}

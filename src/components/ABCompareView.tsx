@@ -613,7 +613,7 @@ export default function ABCompareView({
               onClick={resetCurrentTransform}
             >
               <Maximize size={15} />
-              {t("resetCurrent")}
+              <span>{t("resetCurrent")}</span>
             </button>
             <button
               type="button"
@@ -633,7 +633,7 @@ export default function ABCompareView({
               onClick={resetAllTransforms}
             >
               <Maximize size={15} />
-              {t("resetAll")}
+              <span>{t("resetAll")}</span>
             </button>
           </div>,
           toolbarActionsTarget,
