@@ -211,10 +211,21 @@
 .grid-view.multi-compare-view {
   padding: 2px !important;
   gap: 2px !important;
+
+  /*
+   * 由图片数量决定理想卡片宽度，窄窗口下仍会自动换行。
+   * flex 的居中规则同时修正奇数张图片末行靠左的问题。
+   */
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
 }
 
 /* 缩小卡片边框圆角，减少视觉留白 */
 .grid-view.multi-compare-view .multi-compare-card {
+  width: var(--multi-grid-card-basis);
+  flex: 0 0 var(--multi-grid-card-basis);
   border-radius: 3px;
   content-visibility: auto;
   contain-intrinsic-size: auto 250px;

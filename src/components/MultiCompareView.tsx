@@ -14,6 +14,10 @@ import {
   getTransformKeyboardAction,
   isTextEditingTarget,
 } from "../utils/viewerKeyboard";
+import {
+  getMultiGridCardBasis,
+  getPreferredMultiGridColumns,
+} from "../utils/multiGridLayout";
 
 type DragState = {
   imageId: string;
@@ -368,6 +372,11 @@ export default function MultiCompareView({ images }: Props) {
       ? document.getElementById("viewer-toolbar-center")
       : null;
 
+  const preferredColumns = getPreferredMultiGridColumns(images.length);
+  const gridStyle = {
+    "--multi-grid-card-basis": getMultiGridCardBasis(preferredColumns),
+  } as React.CSSProperties;
+
   return (
     <>
       {/* 中间区域：多图缩放和复位控件 */}
@@ -429,7 +438,11 @@ export default function MultiCompareView({ images }: Props) {
         )}
 
       <div className="multi-compare-shell" ref={rootRef}>
-        <div className="grid-view multi-compare-view">
+        <div
+          className="grid-view multi-compare-view"
+          data-layout-columns={preferredColumns}
+          style={gridStyle}
+        >
           {images.map((image) => {
             const local = getLocalTransform(image.id);
 

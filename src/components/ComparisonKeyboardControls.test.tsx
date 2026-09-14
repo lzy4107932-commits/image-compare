@@ -108,6 +108,12 @@ describe("comparison keyboard controls", () => {
     const globalZoom = screen.getByRole("button", {
       name: /Synchronized zoom level/,
     });
+    const grid = document.querySelector<HTMLElement>(".multi-compare-view");
+
+    expect(grid?.dataset.layoutColumns).toBe("3");
+    expect(grid?.style.getPropertyValue("--multi-grid-card-basis")).toContain(
+      "33.333333%",
+    );
 
     for (const image of screen.getAllByRole("img")) {
       expect(image.getAttribute("loading")).toBe("lazy");
