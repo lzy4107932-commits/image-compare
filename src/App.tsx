@@ -420,6 +420,12 @@ function App() {
       : viewMode === "compare"
         ? compareStatusHelp
         : gridStatusHelp;
+  const currentCompactStatusHelp =
+    viewMode === "single"
+      ? t("singleKeyboardHelp")
+      : viewMode === "compare"
+        ? t("compareKeyboardHelp")
+        : t("gridKeyboardHelp");
   return (
     <div className="app">
       <AppHeader
@@ -528,6 +534,7 @@ function App() {
             rotation={rotation}
             zoom={zoom}
             help={currentStatusHelp}
+            compactHelp={currentCompactStatusHelp}
           />
         </main>
       </div>

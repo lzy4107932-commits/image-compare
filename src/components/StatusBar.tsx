@@ -7,6 +7,7 @@ type Props = {
   rotation: number;
   zoom: number;
   help: string;
+  compactHelp: string;
 };
 
 export default function StatusBar({
@@ -15,6 +16,7 @@ export default function StatusBar({
   rotation,
   zoom,
   help,
+  compactHelp,
 }: Props) {
   const { t } = useI18n();
 
@@ -25,19 +27,29 @@ export default function StatusBar({
       </span>
 
       <span className="statusbar-help" title={help}>
-        {help}
+        <span className="statusbar-help-full">{help}</span>
+        <span className="statusbar-help-compact">{compactHelp}</span>
       </span>
 
       <span className="statusbar-meta">
-        {viewMode === "single" ? (
-          <>
-            {rotation}° · {t("zoomLabel")}: {zoom}%
-          </>
-        ) : viewMode === "compare" ? (
-          t("compareView")
-        ) : (
-          t("gridModeDescription")
-        )}
+        <span className="statusbar-meta-full">
+          {viewMode === "single" ? (
+            <>
+              {rotation}° · {t("zoomLabel")}: {zoom}%
+            </>
+          ) : viewMode === "compare" ? (
+            t("compareView")
+          ) : (
+            t("gridModeDescription")
+          )}
+        </span>
+        <span className="statusbar-meta-compact">
+          {viewMode === "single"
+            ? `${zoom}% · ${rotation}°`
+            : viewMode === "compare"
+              ? t("compare")
+              : t("grid")}
+        </span>
       </span>
     </footer>
   );

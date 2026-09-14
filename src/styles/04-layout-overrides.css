@@ -104,6 +104,29 @@
   text-align: right;
 }
 
+.statusbar-help-full,
+.statusbar-meta-full {
+  display: inline;
+}
+
+.statusbar-help-compact,
+.statusbar-meta-compact {
+  display: none;
+}
+
+/* 查看器变窄时显示真正的短提示，完整内容继续保留在 title 中。 */
+@container image-viewer (max-width: 980px) {
+  .statusbar-help-full,
+  .statusbar-meta-full {
+    display: none;
+  }
+
+  .statusbar-help-compact,
+  .statusbar-meta-compact {
+    display: inline;
+  }
+}
+
 /* 按查看器可用宽度响应，而不是按包含侧边栏的整窗宽度响应。 */
 .viewer {
   container-name: image-viewer;
