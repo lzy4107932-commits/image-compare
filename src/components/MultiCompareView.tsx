@@ -27,6 +27,7 @@ import {
   getResponsiveMultiGridColumns,
 } from "../utils/multiGridLayout";
 import FileNameToggle from "./FileNameToggle";
+import FileNameOverlay from "./FileNameOverlay";
 
 type DragState = {
   imageId: string;
@@ -564,12 +565,10 @@ export default function MultiCompareView({
                   </span>
 
                   {showFileNames && (
-                    <div
-                      className="viewer-file-name grid-card-name"
-                      title={image.name}
-                    >
-                      {image.name}
-                    </div>
+                    <FileNameOverlay
+                      fileName={image.name}
+                      className="grid-card-name"
+                    />
                   )}
                 </div>
               </div>

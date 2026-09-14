@@ -1,4 +1,5 @@
 import type { LocalImage } from "../types";
+import FileNameOverlay from "./FileNameOverlay";
 
 type Props = {
   image: LocalImage;
@@ -21,9 +22,7 @@ export default function SingleImageView({
         style={{ transform }}
       />
       {showFileName && (
-        <div className="viewer-file-name single-file-name" title={image.name}>
-          {image.name}
-        </div>
+        <FileNameOverlay fileName={image.name} className="single-file-name" />
       )}
     </div>
   );

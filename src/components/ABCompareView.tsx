@@ -28,6 +28,7 @@ import {
   isTextEditingTarget,
 } from "../utils/viewerKeyboard";
 import FileNameToggle from "./FileNameToggle";
+import FileNameOverlay from "./FileNameOverlay";
 
 type CompareMode = "side" | "overlay";
 type OperationMode = "sync" | "a" | "b";
@@ -667,7 +668,7 @@ export default function ABCompareView({
                   style={transformStyleA}
                 />
                 {showFileNames && (
-                  <div className="viewer-file-name">{imageA.name}</div>
+                  <FileNameOverlay fileName={imageA.name} />
                 )}
               </div>
             </div>
@@ -692,7 +693,7 @@ export default function ABCompareView({
                   style={transformStyleB}
                 />
                 {showFileNames && (
-                  <div className="viewer-file-name">{imageB.name}</div>
+                  <FileNameOverlay fileName={imageB.name} />
                 )}
               </div>
             </div>
@@ -752,12 +753,16 @@ export default function ABCompareView({
 
               {showFileNames && (
                 <>
-                  <div className="viewer-file-name ab-overlay-name is-a">
-                    A：{imageA.name}
-                  </div>
-                  <div className="viewer-file-name ab-overlay-name is-b">
-                    B：{imageB.name}
-                  </div>
+                  <FileNameOverlay
+                    fileName={imageA.name}
+                    prefix="A："
+                    className="ab-overlay-name is-a"
+                  />
+                  <FileNameOverlay
+                    fileName={imageB.name}
+                    prefix="B："
+                    className="ab-overlay-name is-b"
+                  />
                 </>
               )}
 

@@ -278,23 +278,51 @@
   );
   box-shadow: 0 1px 4px rgb(0 0 0 / 24%);
 
+  display: flex;
+  align-items: center;
+
   font-size: 11px;
   line-height: 22px;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   pointer-events: none;
 }
 
+.file-name-prefix,
+.file-name-extension {
+  flex: 0 0 auto;
+}
+
+.file-name-stem {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 文件名显示开关同时提供图形、文字和按下状态。 */
-.file-name-toggle {
+.zoom-controls .file-name-toggle,
+.multi-compare-toolbar-actions .file-name-toggle,
+.viewer-toolbar-actions .ab-transform-controls .file-name-toggle {
+  width: auto;
   min-width: max-content;
   padding-right: 9px;
   padding-left: 9px;
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: 5px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.file-name-toggle > span {
+  min-width: max-content;
+  display: inline-block;
+  flex: 0 0 auto;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -325,6 +353,7 @@
 
 .ab-overlay-name.is-b {
   left: calc(50% + 54px);
+  justify-content: flex-end;
   text-align: right;
 }
 
