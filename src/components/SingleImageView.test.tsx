@@ -25,9 +25,11 @@ describe("SingleImageView", () => {
     );
 
     const fileName = screen.getByTitle(image.name);
+    const displayedImage = screen.getByRole("img", { name: image.name });
 
     expect(fileName.classList.contains("single-file-name")).toBe(true);
     expect(fileName.closest(".single-view")).not.toBeNull();
+    expect(displayedImage.classList.contains("single-view-image")).toBe(true);
   });
 
   it("removes the overlay without removing the image", () => {

@@ -15,6 +15,7 @@ export default function SingleImageView({
   return (
     <div className="single-view">
       <img
+        className="single-view-image"
         src={image.url}
         alt={image.name}
         decoding="async"

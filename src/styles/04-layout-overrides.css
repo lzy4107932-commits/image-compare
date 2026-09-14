@@ -356,6 +356,20 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+  contain: strict;
+}
+
+/*
+ * 单图 100% 表示适应当前画布，而不是使用原图像素尺寸。
+ * 小图保持自然尺寸，大图按比例缩小，任何方向都不会在初始状态裁切。
+ */
+.single-view > .single-view-image {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  backface-visibility: hidden;
 }
 
 .single-file-name {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   ChangeEvent,
   DragEvent,
@@ -109,6 +109,14 @@ function App() {
 
   const [isPanning, setIsPanning] = useState(false);
 
+  const selectImageWithReset = useCallback((imageId: string) => {
+    selectImage(imageId);
+    setZoom(100);
+    setRotation(0);
+    setPan({ x: 0, y: 0 });
+    setIsPanning(false);
+  }, [selectImage]);
+
   const panStartRef = useRef({
     mouseX: 0,
     mouseY: 0,
@@ -170,7 +178,7 @@ function App() {
         const previousIndex =
           currentIndex <= 0 ? images.length - 1 : currentIndex - 1;
 
-        selectImage(images[previousIndex].id);
+        selectImageWithReset(images[previousIndex].id);
         return;
       }
 
@@ -179,7 +187,7 @@ function App() {
           ? 0
           : currentIndex + 1;
 
-      selectImage(images[nextIndex].id);
+      selectImageWithReset(images[nextIndex].id);
     }
 
     window.addEventListener("keydown", handleWindowKeyDown);
@@ -187,7 +195,7 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleWindowKeyDown);
     };
-  }, [images, selectImage, selectedId, viewMode]);
+  }, [images, selectImageWithReset, selectedId, viewMode]);
 
   function handleImport(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.files) {
@@ -448,7 +456,7 @@ function App() {
           selectedImageId={selectedImage?.id ?? null}
           compareAId={compareAImage?.id ?? null}
           compareBId={compareBImage?.id ?? null}
-          onSelect={selectImage}
+          onSelect={selectImageWithReset}
           onSetAsA={setAsImageA}
           onSetAsB={setAsImageB}
           onDelete={deleteImage}
