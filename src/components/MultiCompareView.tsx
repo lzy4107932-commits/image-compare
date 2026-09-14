@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Grid3X3, Maximize, Minus, Plus, RotateCw } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Grid3X3,
+  Maximize,
+  Minus,
+  Plus,
+  RotateCw,
+} from "lucide-react";
 import { useI18n } from "../useI18n";
 import type { LocalImage } from "../types";
 import {
@@ -39,6 +47,7 @@ export default function MultiCompareView({ images }: Props) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [showFileNames, setShowFileNames] = useState(true);
 
   const dragRef = useRef<DragState | null>(null);
 
@@ -458,6 +467,22 @@ export default function MultiCompareView({ images }: Props) {
 
             <button
               type="button"
+              className="multi-filename-toggle"
+              title={
+                showFileNames ? t("hideFileNames") : t("showFileNames")
+              }
+              aria-label={
+                showFileNames ? t("hideFileNames") : t("showFileNames")
+              }
+              aria-pressed={showFileNames}
+              onClick={() => setShowFileNames((current) => !current)}
+            >
+              {showFileNames ? <Eye size={16} /> : <EyeOff size={16} />}
+              <span>{t("fileNames")}</span>
+            </button>
+
+            <button
+              type="button"
               className="transform-action-button transform-rotate-button"
               title={`${t("rotateAllImages")} (R)`}
               aria-label={t("rotateAllImages")}
@@ -545,9 +570,11 @@ export default function MultiCompareView({ images }: Props) {
                     {t("singleImageZoom")} {local.zoom}%
                   </span>
 
-                  <div className="grid-card-name" title={image.name}>
-                    {image.name}
-                  </div>
+                  {showFileNames && (
+                    <div className="grid-card-name" title={image.name}>
+                      {image.name}
+                    </div>
+                  )}
                 </div>
               </div>
             );

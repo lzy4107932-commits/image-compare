@@ -129,6 +129,19 @@ describe("comparison keyboard controls", () => {
       ).toBe(image.getAttribute("alt"));
     }
 
+    const fileNameToggle = screen.getByRole("button", {
+      name: "Hide file names",
+    });
+
+    expect(fileNameToggle.getAttribute("aria-pressed")).toBe("true");
+    await user.click(fileNameToggle);
+    expect(
+      screen.getByRole("button", { name: "Show file names" }).getAttribute(
+        "aria-pressed",
+      ),
+    ).toBe("false");
+    expect(document.querySelector(".grid-card-name")).toBeNull();
+
     await user.keyboard("+");
     expect(globalZoom.textContent).toContain("110%");
     expect(globalZoom.getAttribute("aria-label")).toContain("110%");

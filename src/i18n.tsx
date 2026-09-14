@@ -26,6 +26,9 @@ const translations = {
     delete: "删除",
     reset: "复位",
     resetAll: "全部复位",
+    showFileNames: "显示文件名",
+    hideFileNames: "隐藏文件名",
+    fileNames: "文件名",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -153,6 +156,9 @@ const translations = {
     delete: "Delete",
     reset: "Reset",
     resetAll: "Reset All",
+    showFileNames: "Show file names",
+    hideFileNames: "Hide file names",
+    fileNames: "File names",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

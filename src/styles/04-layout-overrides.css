@@ -282,6 +282,18 @@
   line-height: 22px;
   pointer-events: none;
 }
+
+/* 文件名显示开关同时提供图形、文字和按下状态。 */
+.multi-compare-toolbar-actions .multi-filename-toggle {
+  min-width: max-content;
+  padding-right: 9px;
+  padding-left: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
 /* ==================================================
    查看器顶部统一工具栏插槽
    ================================================== */
