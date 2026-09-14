@@ -8,6 +8,7 @@ import {
   RotateCw,
 } from "lucide-react";
 import { useI18n } from "../useI18n";
+import { useFrameScheduler } from "../hooks/useFrameScheduler";
 import type { LocalImage } from "../types";
 import {
   clampZoom,
@@ -46,6 +47,13 @@ type Props = {
   onImageLoadError?: (imageId: string) => void;
 };
 
+type PendingDragUpdate = {
+  imageId: string;
+  local: boolean;
+  x: number;
+  y: number;
+};
+
 export default function MultiCompareView({
   images,
   showFileNames,
@@ -69,6 +77,32 @@ export default function MultiCompareView({
     imageId: string;
     local: boolean;
   } | null>(null);
+
+  const applyDragUpdate = (update: PendingDragUpdate) => {
+    if (update.local) {
+      setLocalTransforms((currentTransforms) => {
+        const current = currentTransforms[update.imageId] ?? DEFAULT_TRANSFORM;
+
+        return {
+          ...currentTransforms,
+          [update.imageId]: {
+            ...current,
+            x: update.x,
+            y: update.y,
+          },
+        };
+      });
+      return;
+    }
+
+    setGlobalTransform((current) => ({
+      ...current,
+      x: update.x,
+      y: update.y,
+    }));
+  };
+  const { schedule: scheduleDragUpdate, flush: flushDragUpdate } =
+    useFrameScheduler(applyDragUpdate);
 
   function getLocalTransform(imageId: string) {
     return localTransforms[imageId] ?? DEFAULT_TRANSFORM;
@@ -358,28 +392,12 @@ export default function MultiCompareView({
     const moveX = event.clientX - drag.startX;
     const moveY = event.clientY - drag.startY;
 
-    if (drag.local) {
-      setLocalTransforms((currentTransforms) => {
-        const current = currentTransforms[drag.imageId] ?? DEFAULT_TRANSFORM;
-
-        return {
-          ...currentTransforms,
-          [drag.imageId]: {
-            ...current,
-            x: drag.originX + moveX,
-            y: drag.originY + moveY,
-          },
-        };
-      });
-
-      return;
-    }
-
-    setGlobalTransform((current) => ({
-      ...current,
+    scheduleDragUpdate({
+      imageId: drag.imageId,
+      local: drag.local,
       x: drag.originX + moveX,
       y: drag.originY + moveY,
-    }));
+    });
   }
 
   function stopPointerDrag(event: React.PointerEvent<HTMLDivElement>) {
@@ -391,6 +409,7 @@ export default function MultiCompareView({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
+    flushDragUpdate();
     dragRef.current = null;
     setDragging(null);
   }
@@ -503,7 +522,11 @@ export default function MultiCompareView({
 
       <div className="multi-compare-shell" ref={rootRef}>
         <div
-          className="grid-view multi-compare-view"
+          className={
+            dragging
+              ? "grid-view multi-compare-view is-transforming"
+              : "grid-view multi-compare-view"
+          }
           data-layout-columns={columns}
           data-layout-rows={rows}
           data-preferred-columns={preferredColumns}

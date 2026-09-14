@@ -1228,10 +1228,13 @@ button {
 
 .multi-compare-image-area img {
   transform-origin: center center;
-  will-change: transform;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+}
+
+.multi-compare-view.is-transforming .multi-compare-image-area img {
+  will-change: transform;
 }
 
 .multi-compare-card.is-local-adjusting {
