@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_IMAGE_COUNT,
   MAX_IMAGE_FILE_BYTES,
+  MAX_TOTAL_IMAGE_BYTES,
   selectImportableImages,
 } from "./imageImport";
 
@@ -16,6 +17,7 @@ describe("selectImportableImages", () => {
     expect(result).toMatchObject({
       rejectedType: 0,
       rejectedSize: 0,
+      rejectedTotalSize: 0,
       rejectedCount: 0,
     });
   });
@@ -42,5 +44,16 @@ describe("selectImportableImages", () => {
 
     expect(result.accepted).toHaveLength(1);
     expect(result.rejectedCount).toBe(2);
+  });
+
+  it("limits aggregate imported file size", () => {
+    const result = selectImportableImages(
+      [image(10), image(20)],
+      1,
+      MAX_TOTAL_IMAGE_BYTES - 15,
+    );
+
+    expect(result.accepted).toHaveLength(1);
+    expect(result.rejectedTotalSize).toBe(1);
   });
 });

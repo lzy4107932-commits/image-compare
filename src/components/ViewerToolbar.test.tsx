@@ -25,6 +25,7 @@ describe("ViewerToolbar transform actions", () => {
         <ViewerToolbar
           viewMode="single"
           zoom={125}
+          rotation={90}
           onZoomOut={vi.fn()}
           onZoomIn={vi.fn()}
           onReset={onReset}
@@ -42,6 +43,19 @@ describe("ViewerToolbar transform actions", () => {
     expect(rotate.textContent).toContain("Rotate 90°");
     expect(reset?.classList.contains("transform-reset-button")).toBe(true);
     expect(reset?.textContent).toContain("Reset");
+    expect(
+      screen.getByRole("button", {
+        name: "Reset current view: Zoom 125%, Rotation 90°",
+      }),
+    ).toBeDefined();
+    expect(
+      screen
+        .getByRole("button", {
+          name: "Reset current view: Zoom 125%, Rotation 90°",
+        })
+        .getAttribute("aria-live"),
+    ).toBe("polite");
+    expect(screen.getByText("125% · 90°")).toBeDefined();
 
     await user.click(rotate);
     if (reset) {

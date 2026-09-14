@@ -13,6 +13,7 @@ import { useI18n } from "../useI18n";
 import {
   MAX_IMAGE_COUNT,
   MAX_IMAGE_FILE_MIB,
+  MAX_TOTAL_IMAGE_MIB,
   selectImportableImages,
 } from "../utils/imageImport";
 
@@ -48,6 +49,7 @@ export function useImageLibrary() {
       const selection = selectImportableImages(
         Array.from(fileList),
         stateRef.current.images.length,
+        stateRef.current.images.reduce((total, image) => total + image.size, 0),
       );
       const notices: string[] = [];
 
@@ -69,6 +71,13 @@ export function useImageLibrary() {
         );
       }
 
+
+      if (selection.rejectedTotalSize > 0) {
+        notices.push(
+          `${t("totalImageSizeLimitReached")} (${MAX_TOTAL_IMAGE_MIB} MiB): ${selection.rejectedTotalSize}`,
+        );
+      }
+
       setImportNotice(notices.length > 0 ? notices.join(" · ") : null);
 
       if (selection.accepted.length === 0) {
@@ -79,6 +88,7 @@ export function useImageLibrary() {
         id: createImageId(file, index),
         name: file.name,
         url: URL.createObjectURL(file),
+        size: file.size,
       }));
 
       applyAction({ type: "add", images });

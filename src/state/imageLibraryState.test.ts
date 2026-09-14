@@ -8,7 +8,12 @@ import {
   INITIAL_IMAGE_LIBRARY_STATE,
 } from "./imageLibraryState";
 
-const image = (id: string): LocalImage => ({ id, name: `${id}.png`, url: id });
+const image = (id: string): LocalImage => ({
+  id,
+  name: `${id}.png`,
+  url: id,
+  size: 1024,
+});
 
 describe("imageLibraryReducer", () => {
   it("initializes selection and A/B roles from an imported batch", () => {

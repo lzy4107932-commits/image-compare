@@ -44,13 +44,14 @@ export default function AppHeader({
         </div>
       </div>
 
-      <div className="mode-switch">
+      <div className="mode-switch" role="group" aria-label={t("viewMode")}>
         <button
           type="button"
           className={viewMode === "single" ? "active" : ""}
           onClick={() => onViewModeChange("single")}
           title={t("single")}
           aria-label={t("single")}
+          aria-pressed={viewMode === "single"}
         >
           <ImageIcon size={18} />
           <span>{t("single")}</span>
@@ -62,6 +63,7 @@ export default function AppHeader({
           onClick={() => onViewModeChange("compare")}
           title={t("compare")}
           aria-label={t("compare")}
+          aria-pressed={viewMode === "compare"}
         >
           <Columns2 size={18} />
           <span>{t("compare")}</span>
@@ -73,6 +75,7 @@ export default function AppHeader({
           onClick={() => onViewModeChange("grid")}
           title={t("grid")}
           aria-label={t("grid")}
+          aria-pressed={viewMode === "grid"}
         >
           <Grid2X2 size={18} />
           <span>{t("grid")}</span>

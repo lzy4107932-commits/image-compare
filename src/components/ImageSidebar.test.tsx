@@ -8,8 +8,8 @@ import type { LocalImage } from "../types";
 import ImageSidebar from "./ImageSidebar";
 
 const images: LocalImage[] = [
-  { id: "one", name: "first.png", url: "blob:first" },
-  { id: "two", name: "second.png", url: "blob:second" },
+  { id: "one", name: "first.png", url: "blob:first", size: 1024 },
+  { id: "two", name: "second.png", url: "blob:second", size: 1024 },
 ];
 
 function renderSidebar(overrides: Partial<Parameters<typeof ImageSidebar>[0]> = {}) {

@@ -501,10 +501,15 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
       {toolbarCenterTarget &&
         createPortal(
           <div className="ab-toolbar-portal ab-toolbar-portal-center">
-            <div className="ab-display-modes">
+            <div
+              className="ab-display-modes"
+              role="group"
+              aria-label={t("compareDisplayMode")}
+            >
               <button
                 type="button"
                 className={compareMode === "side" ? "active" : ""}
+                aria-pressed={compareMode === "side"}
                 onClick={() => setCompareMode("side")}
               >
                 <Columns2 size={16} />
@@ -513,6 +518,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               <button
                 type="button"
                 className={compareMode === "overlay" ? "active" : ""}
+                aria-pressed={compareMode === "overlay"}
                 onClick={() => setCompareMode("overlay")}
               >
                 <Layers3 size={15} />
@@ -520,11 +526,16 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               </button>
             </div>
             <div className="ab-toolbar-separator" />
-            <div className="ab-operation-modes">
+            <div
+              className="ab-operation-modes"
+              role="group"
+              aria-label={t("operationTarget")}
+            >
               <span>{t("operationTarget")}:</span>
               <button
                 type="button"
                 className={operationMode === "sync" ? "active sync" : ""}
+                aria-pressed={operationMode === "sync"}
                 onClick={() => setOperationMode("sync")}
               >
                 {t("sync")}
@@ -532,6 +543,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               <button
                 type="button"
                 className={operationMode === "a" ? "active image-a" : ""}
+                aria-pressed={operationMode === "a"}
                 onClick={() => setOperationMode("a")}
               >
                 {t("adjustA")}
@@ -539,6 +551,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               <button
                 type="button"
                 className={operationMode === "b" ? "active image-b" : ""}
+                aria-pressed={operationMode === "b"}
                 onClick={() => setOperationMode("b")}
               >
                 {t("adjustB")}
@@ -562,8 +575,10 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
             <button
               type="button"
               className="ab-zoom-value"
-              title={t("currentZoom")}
-              aria-label={t("currentZoom")}
+              title={`${t("resetCurrentTitle")}: ${operationZoom}% · ${operationRotation}°`}
+              aria-label={`${t("currentZoom")}: ${operationZoom}%, ${t("rotationAngle")}: ${operationRotation}°`}
+              aria-live="polite"
+              aria-atomic="true"
               onClick={resetCurrentTransform}
             >
               {operationZoom}% · {operationRotation}°

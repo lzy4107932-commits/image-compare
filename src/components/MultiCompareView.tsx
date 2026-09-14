@@ -386,8 +386,10 @@ export default function MultiCompareView({ images }: Props) {
             <button
               type="button"
               className="multi-zoom-value"
-              title={t("globalZoomLevel")}
-              aria-label={t("globalZoomLevel")}
+              title={`${t("resetAllTransforms")}: ${globalTransform.zoom}% · ${globalTransform.rotation}°`}
+              aria-label={`${t("globalZoomLevel")}: ${globalTransform.zoom}%, ${t("rotationAngle")}: ${globalTransform.rotation}°`}
+              aria-live="polite"
+              aria-atomic="true"
               onClick={() => setGlobalTransform(DEFAULT_TRANSFORM)}
             >
               {globalTransform.zoom}% · {globalTransform.rotation}°

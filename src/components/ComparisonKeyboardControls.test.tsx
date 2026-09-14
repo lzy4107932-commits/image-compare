@@ -9,9 +9,9 @@ import ABCompareView from "./ABCompareView";
 import MultiCompareView from "./MultiCompareView";
 
 const images: LocalImage[] = [
-  { id: "one", name: "first.png", url: "blob:first" },
-  { id: "two", name: "second.png", url: "blob:second" },
-  { id: "three", name: "third.png", url: "blob:third" },
+  { id: "one", name: "first.png", url: "blob:first", size: 1024 },
+  { id: "two", name: "second.png", url: "blob:second", size: 1024 },
+  { id: "three", name: "third.png", url: "blob:third", size: 1024 },
 ];
 
 function addToolbarTargets() {
@@ -45,11 +45,23 @@ describe("comparison keyboard controls", () => {
     );
 
     const currentZoom = screen.getByRole("button", {
-      name: "Zoom level of current target",
+      name: /Zoom level of current target/,
     });
+
+    expect(
+      screen.getByRole("button", { name: "Side by Side" }).getAttribute(
+        "aria-pressed",
+      ),
+    ).toBe("true");
+    expect(
+      screen.getByRole("button", { name: "Overlay" }).getAttribute(
+        "aria-pressed",
+      ),
+    ).toBe("false");
 
     await user.keyboard("+");
     expect(currentZoom.textContent).toContain("110%");
+    expect(currentZoom.getAttribute("aria-label")).toContain("110%");
 
     await user.click(
       screen.getByRole("button", {
@@ -70,6 +82,11 @@ describe("comparison keyboard controls", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Adjust A" }));
+    expect(
+      screen.getByRole("button", { name: "Adjust A" }).getAttribute(
+        "aria-pressed",
+      ),
+    ).toBe("true");
     await user.keyboard("r");
     expect(screen.getByRole("img", { name: "first.png" }).style.transform).toContain(
       "rotate(90deg)",
@@ -89,11 +106,12 @@ describe("comparison keyboard controls", () => {
     );
 
     const globalZoom = screen.getByRole("button", {
-      name: "Synchronized zoom level",
+      name: /Synchronized zoom level/,
     });
 
     await user.keyboard("+");
     expect(globalZoom.textContent).toContain("110%");
+    expect(globalZoom.getAttribute("aria-label")).toContain("110%");
 
     await user.click(
       screen.getByRole("button", {

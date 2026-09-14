@@ -1121,7 +1121,7 @@ button[aria-selected="true"]:not(:disabled) {
 .viewer-toolbar:not(:has(.ab-toolbar-portal-center))
   .multi-compare-toolbar-actions
   .multi-zoom-value {
-  min-width: 58px;
+  min-width: 88px;
 }
 
 .viewer-toolbar:not(:has(.ab-toolbar-portal-center))

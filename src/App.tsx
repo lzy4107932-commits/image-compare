@@ -442,6 +442,7 @@ function App() {
           <ViewerToolbar
             viewMode={viewMode}
             zoom={zoom}
+            rotation={rotation}
             onZoomOut={zoomOut}
             onZoomIn={zoomIn}
             onReset={resetView}

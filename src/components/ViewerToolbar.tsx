@@ -12,6 +12,7 @@ import { useI18n } from "../useI18n";
 type Props = {
   viewMode: ViewMode;
   zoom: number;
+  rotation: number;
   onZoomOut: () => void;
   onZoomIn: () => void;
   onReset: () => void;
@@ -21,6 +22,7 @@ type Props = {
 export default function ViewerToolbar({
   viewMode,
   zoom,
+  rotation,
   onZoomOut,
   onZoomIn,
   onReset,
@@ -69,10 +71,12 @@ export default function ViewerToolbar({
           type="button"
           className="zoom-value"
           onClick={onReset}
-          title={t("reset")}
-          aria-label={t("reset")}
+          title={`${t("resetView")}: ${zoom}% · ${rotation}°`}
+          aria-label={`${t("resetView")}: ${t("zoomLabel")} ${zoom}%, ${t("rotationAngle")} ${rotation}°`}
+          aria-live="polite"
+          aria-atomic="true"
         >
-          {zoom}%
+          {zoom}% · {rotation}°
         </button>
 
         <button
@@ -97,16 +101,16 @@ export default function ViewerToolbar({
           </button>
         )}
 
-          <button
-            type="button"
-            className="transform-action-button transform-reset-button"
-            onClick={onReset}
+        <button
+          type="button"
+          className="transform-action-button transform-reset-button"
+          onClick={onReset}
           title={t("reset")}
           aria-label={t("reset")}
-          >
-            <Maximize size={17} />
-            <span>{t("reset")}</span>
-          </button>
+        >
+          <Maximize size={17} />
+          <span>{t("reset")}</span>
+        </button>
       </div>
     </div>
   );
