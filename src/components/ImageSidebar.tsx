@@ -2,6 +2,7 @@ import { useState, type DragEvent, type KeyboardEvent } from "react";
 import { GripVertical, Image as ImageIcon, Trash2 } from "lucide-react";
 import type { LocalImage } from "../types";
 import { useI18n } from "../useI18n";
+import { getDragAutoScrollAmount } from "../utils/sidebarReorder";
 
 type Props = {
   images: LocalImage[];
@@ -30,6 +31,7 @@ export default function ImageSidebar({
 }: Props) {
   const { t } = useI18n();
   const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
+  const [reorderAnnouncement, setReorderAnnouncement] = useState("");
   const [dropTarget, setDropTarget] = useState<{
     imageId: string;
     insertionIndex: number;
@@ -39,6 +41,24 @@ export default function ImageSidebar({
   function clearDragState() {
     setDraggedImageId(null);
     setDropTarget(null);
+  }
+
+  function reorderAndAnnounce(imageId: string, toIndex: number) {
+    const fromIndex = images.findIndex((image) => image.id === imageId);
+
+    if (fromIndex < 0) {
+      return;
+    }
+
+    const insertionIndex = Math.min(images.length, Math.max(0, toIndex));
+    const finalIndex =
+      fromIndex < insertionIndex ? insertionIndex - 1 : insertionIndex;
+    const image = images[fromIndex];
+
+    onReorder(imageId, toIndex);
+    setReorderAnnouncement(
+      `${t("reorderComplete")}: ${image.name}, ${t("listPosition")} ${finalIndex + 1}`,
+    );
   }
 
   function handleDragStart(event: DragEvent<HTMLButtonElement>, imageId: string) {
@@ -78,7 +98,7 @@ export default function ImageSidebar({
     const imageId = draggedImageId || event.dataTransfer.getData("text/plain");
 
     if (imageId && dropTarget) {
-      onReorder(imageId, dropTarget.insertionIndex);
+      reorderAndAnnounce(imageId, dropTarget.insertionIndex);
     }
 
     clearDragState();
@@ -106,7 +126,27 @@ export default function ImageSidebar({
     }
 
     event.preventDefault();
-    onReorder(imageId, toIndex);
+    reorderAndAnnounce(imageId, toIndex);
+  }
+
+  function handleListDragOver(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    const list = event.currentTarget;
+    const bounds = list.getBoundingClientRect();
+
+    if (typeof list.scrollBy !== "function") {
+      return;
+    }
+
+    const scrollAmount = getDragAutoScrollAmount(
+      event.clientY,
+      bounds.top,
+      bounds.bottom,
+    );
+
+    if (scrollAmount !== 0) {
+      list.scrollBy({ top: scrollAmount, behavior: "auto" });
+    }
   }
 
   return (
@@ -120,7 +160,7 @@ export default function ImageSidebar({
         </div>
       </div>
 
-      <div className="image-list">
+      <div className="image-list" onDragOver={handleListDragOver}>
         {images.length === 0 ? (
           <div className="sidebar-empty">
             <ImageIcon size={32} />
@@ -230,6 +270,10 @@ export default function ImageSidebar({
             );
           })
         )}
+      </div>
+
+      <div className="visually-hidden" role="status" aria-live="polite">
+        {reorderAnnouncement}
       </div>
     </aside>
   );

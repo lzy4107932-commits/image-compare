@@ -31,6 +31,8 @@ const translations = {
     fileNames: "文件名",
     reorderImage: "调整图片顺序",
     reorderImageHint: "拖动排序，或使用方向键移动",
+    reorderComplete: "排序完成",
+    listPosition: "位置",
 
     sideBySide: "左右对比",
     overlay: "重叠对比",
@@ -163,6 +165,8 @@ const translations = {
     fileNames: "File names",
     reorderImage: "Reorder image",
     reorderImageHint: "Drag to reorder, or use arrow keys to move",
+    reorderComplete: "Reorder complete",
+    listPosition: "position",
 
     sideBySide: "Side by Side",
     overlay: "Overlay",

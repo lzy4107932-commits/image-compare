@@ -94,6 +94,9 @@ describe("ImageSidebar", () => {
     fireEvent.keyDown(handle, { key: "ArrowUp" });
 
     expect(props.onReorder).toHaveBeenCalledWith("two", 0);
+    expect(screen.getByRole("status").textContent).toBe(
+      "Reorder complete: second.png, position 1",
+    );
   });
 
   it("drops an image after the pointed list item", () => {
@@ -126,4 +129,5 @@ describe("ImageSidebar", () => {
 
     expect(props.onReorder).toHaveBeenCalledWith("one", 2);
   });
+
 });
