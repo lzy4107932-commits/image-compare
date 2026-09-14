@@ -6,7 +6,14 @@ import {
   type SetStateAction,
 } from "react";
 import { createPortal } from "react-dom";
-import { Columns2, Layers3, Minus, Plus, RotateCcw } from "lucide-react";
+import {
+  Columns2,
+  Layers3,
+  Minus,
+  Plus,
+  RotateCcw,
+  RotateCw,
+} from "lucide-react";
 import { useI18n } from "../useI18n";
 import type { LocalImage } from "../types";
 import {
@@ -16,6 +23,10 @@ import {
   type TransformState,
   zoomAtPoint,
 } from "../utils/imageTransforms";
+import {
+  getTransformKeyboardAction,
+  isTextEditingTarget,
+} from "../utils/viewerKeyboard";
 
 type CompareMode = "side" | "overlay";
 type OperationMode = "sync" | "a" | "b";
@@ -143,6 +154,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
       t("wheelZoom"),
       t("dragToPan"),
       t("switchBackToSync"),
+      t("compareKeyboardHelp"),
     ].join(" | ");
 
     onHelpChange?.(help);
@@ -278,6 +290,55 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
     dragRef.current = null;
     dividerDragRef.current = null;
   }
+
+  function rotateCurrentTransform() {
+    updateOperationTransform((current) => ({
+      ...current,
+      rotation: (current.rotation + 90) % 360,
+    }));
+  }
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (isTextEditingTarget(event.target)) {
+        return;
+      }
+
+      const action = getTransformKeyboardAction(event.key);
+
+      if (!action) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (action === "zoom-in" || action === "zoom-out") {
+        const step = action === "zoom-in" ? 10 : -10;
+
+        updateOperationTransform((current) => ({
+          ...current,
+          zoom: clampZoom(current.zoom + step),
+        }));
+        return;
+      }
+
+      if (action === "reset-view") {
+        updateOperationTransform(() => DEFAULT_TRANSFORM);
+        return;
+      }
+
+      updateOperationTransform((current) => ({
+        ...current,
+        rotation: (current.rotation + 90) % 360,
+      }));
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [updateOperationTransform]);
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) {
@@ -417,11 +478,11 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
   const operationZoom = getOperationTransform().zoom;
 
   const transformStyleA = {
-    transform: `translate(${finalTransformA.x}px, ${finalTransformA.y}px) scale(${finalTransformA.zoom})`,
+    transform: `translate(${finalTransformA.x}px, ${finalTransformA.y}px) scale(${finalTransformA.zoom}) rotate(${finalTransformA.rotation}deg)`,
   };
 
   const transformStyleB = {
-    transform: `translate(${finalTransformB.x}px, ${finalTransformB.y}px) scale(${finalTransformB.zoom})`,
+    transform: `translate(${finalTransformB.x}px, ${finalTransformB.y}px) scale(${finalTransformB.zoom}) rotate(${finalTransformB.rotation}deg)`,
   };
   const toolbarCenterTarget =
     typeof document !== "undefined"
@@ -520,6 +581,14 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               onClick={resetCurrentTransform}
             >
               {t("resetCurrent")}
+            </button>
+            <button
+              type="button"
+              title={`${t("rotateCurrentTarget")} (R)`}
+              aria-label={t("rotateCurrentTarget")}
+              onClick={rotateCurrentTransform}
+            >
+              <RotateCw size={15} />
             </button>
             <button
               type="button"

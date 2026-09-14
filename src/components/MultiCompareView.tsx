@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Grid3X3, Minus, Plus, RotateCcw } from "lucide-react";
+import { Grid3X3, Minus, Plus, RotateCcw, RotateCw } from "lucide-react";
 import { useI18n } from "../useI18n";
 import type { LocalImage } from "../types";
 import {
@@ -10,6 +10,10 @@ import {
   type TransformState,
   zoomAtPoint,
 } from "../utils/imageTransforms";
+import {
+  getTransformKeyboardAction,
+  isTextEditingTarget,
+} from "../utils/viewerKeyboard";
 
 type DragState = {
   imageId: string;
@@ -155,6 +159,58 @@ export default function MultiCompareView({ images }: Props) {
     dragRef.current = null;
   }
 
+  function rotateAllImages() {
+    setGlobalTransform((current) => ({
+      ...current,
+      rotation: (current.rotation + 90) % 360,
+    }));
+  }
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (isTextEditingTarget(event.target)) {
+        return;
+      }
+
+      const action = getTransformKeyboardAction(event.key);
+
+      if (!action) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (action === "zoom-in" || action === "zoom-out") {
+        const step = action === "zoom-in" ? 10 : -10;
+
+        setGlobalTransform((current) => ({
+          ...current,
+          zoom: clampZoom(current.zoom + step),
+        }));
+        return;
+      }
+
+      if (action === "reset-view") {
+        setGlobalTransform(DEFAULT_TRANSFORM);
+        setLocalTransforms({});
+        setDragging(null);
+        dragRef.current = null;
+        return;
+      }
+
+      setGlobalTransform((current) => ({
+        ...current,
+        rotation: (current.rotation + 90) % 360,
+      }));
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   function resetLocalTransform(imageId: string) {
     const globalScale = globalTransform.zoom / 100;
 
@@ -165,7 +221,8 @@ export default function MultiCompareView({ images }: Props) {
     const isGlobalDefault =
       globalTransform.zoom === 100 &&
       globalTransform.x === 0 &&
-      globalTransform.y === 0;
+      globalTransform.y === 0 &&
+      globalTransform.rotation === 0;
 
     if (isGlobalDefault) {
       setLocalTransforms((currentTransforms) => {
@@ -195,6 +252,7 @@ export default function MultiCompareView({ images }: Props) {
         zoom: 10000 / globalTransform.zoom,
         x: -globalTransform.x / globalScale,
         y: -globalTransform.y / globalScale,
+        rotation: (360 - globalTransform.rotation) % 360,
       },
     }));
   }
@@ -352,6 +410,14 @@ export default function MultiCompareView({ images }: Props) {
             >
               <RotateCcw size={16} />
             </button>
+            <button
+              type="button"
+              title={`${t("rotateAllImages")} (R)`}
+              aria-label={t("rotateAllImages")}
+              onClick={rotateAllImages}
+            >
+              <RotateCw size={16} />
+            </button>
           </div>,
           toolbarCenterTarget,
         )}
@@ -364,7 +430,10 @@ export default function MultiCompareView({ images }: Props) {
             const finalTransform = composeTransforms(globalTransform, local);
 
             const hasLocalAdjustment =
-              local.zoom !== 100 || local.x !== 0 || local.y !== 0;
+              local.zoom !== 100 ||
+              local.x !== 0 ||
+              local.y !== 0 ||
+              local.rotation !== 0;
 
             const isLocalDragging =
               dragging?.imageId === image.id && dragging.local;
@@ -396,7 +465,7 @@ export default function MultiCompareView({ images }: Props) {
                     alt={image.name}
                     draggable={false}
                     style={{
-                      transform: `translate(${finalTransform.x}px, ${finalTransform.y}px) scale(${finalTransform.zoom})`,
+                      transform: `translate(${finalTransform.x}px, ${finalTransform.y}px) scale(${finalTransform.zoom}) rotate(${finalTransform.rotation}deg)`,
                     }}
                   />
 

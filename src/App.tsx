@@ -17,6 +17,10 @@ import "./App.css";
 import MultiCompareView from "./components/MultiCompareView";
 import ABCompareView from "./components/ABCompareView";
 import type { Theme, ViewMode } from "./types";
+import {
+  getViewerKeyboardAction,
+  isTextEditingTarget,
+} from "./utils/viewerKeyboard";
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -102,87 +106,55 @@ function App() {
   });
   useEffect(() => {
     function handleWindowKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-
-      const isEditingText =
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        target?.tagName === "SELECT" ||
-        target?.isContentEditable;
-
-      if (isEditingText) {
+      if (isTextEditingTarget(event.target)) {
         return;
       }
 
-      /*
-       * Esc：立即结束图片平移状态。
-       */
-      if (event.key === "Escape") {
+      const action = getViewerKeyboardAction({
+        key: event.key,
+        viewMode,
+        imageCount: images.length,
+      });
+
+      if (!action) {
+        return;
+      }
+
+      if (action === "stop-panning") {
         setIsPanning(false);
-        return;
-      }
-
-      /*
-       * 多图网格模式保留正常滚动，
-       * 不处理图片缩放快捷键。
-       */
-      if (viewMode !== "grid") {
-        /*
-         * + 或 =：放大 10%。
-         */
-        if (event.key === "+" || event.key === "=") {
-          event.preventDefault();
-
-          setZoom((currentZoom) => Math.min(currentZoom + 10, 500));
-
-          return;
-        }
-
-        /*
-         * -：缩小 10%。
-         */
-        if (event.key === "-") {
-          event.preventDefault();
-
-          setZoom((currentZoom) => Math.max(currentZoom - 10, 10));
-
-          return;
-        }
-
-        /*
-         * 0 或 Home：
-         * 恢复 100% 并把图片移动回中心。
-         */
-        if (event.key === "0" || event.key === "Home") {
-          event.preventDefault();
-
-          setZoom(100);
-          setPan({
-            x: 0,
-            y: 0,
-          });
-          setIsPanning(false);
-
-          return;
-        }
-      }
-
-      /*
-       * 左右方向键只在单图模式中切换图片。
-       */
-      if (viewMode !== "single" || images.length === 0) {
-        return;
-      }
-
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
         return;
       }
 
       event.preventDefault();
 
+      if (action === "zoom-in") {
+        setZoom((currentZoom) => Math.min(currentZoom + 10, 500));
+        return;
+      }
+
+      if (action === "zoom-out") {
+        setZoom((currentZoom) => Math.max(currentZoom - 10, 10));
+        return;
+      }
+
+      if (action === "reset-view") {
+        setZoom(100);
+        setPan({
+          x: 0,
+          y: 0,
+        });
+        setIsPanning(false);
+        return;
+      }
+
+      if (action === "rotate-clockwise") {
+        setRotation((currentRotation) => (currentRotation + 90) % 360);
+        return;
+      }
+
       const currentIndex = images.findIndex((image) => image.id === selectedId);
 
-      if (event.key === "ArrowLeft") {
+      if (action === "select-previous") {
         const previousIndex =
           currentIndex <= 0 ? images.length - 1 : currentIndex - 1;
 
@@ -274,7 +246,7 @@ function App() {
   }
 
   function handleCanvasWheel(event: ReactWheelEvent<HTMLDivElement>) {
-    if (viewMode === "grid") {
+    if (viewMode !== "single") {
       return;
     }
 
@@ -313,7 +285,7 @@ function App() {
   }
 
   function handleCanvasMouseDown(event: ReactMouseEvent<HTMLDivElement>) {
-    if (viewMode === "grid") {
+    if (viewMode !== "single") {
       return;
     }
 
@@ -369,7 +341,7 @@ function App() {
     setIsPanning(false);
   }
   function handleCanvasDoubleClick(event: ReactMouseEvent<HTMLDivElement>) {
-    if (viewMode === "grid") {
+    if (viewMode !== "single") {
       return;
     }
 
@@ -405,6 +377,7 @@ function App() {
     t("wheelZoom"),
     t("dragToPan"),
     t("doubleClickReset"),
+    t("singleKeyboardHelp"),
   ].join(" | ");
 
   const compareStatusHelp =
@@ -424,6 +397,7 @@ function App() {
     t("gridShortcutPanOne"),
     t("gridShortcutResetOne"),
     t("gridShortcutResetAll"),
+    t("gridKeyboardHelp"),
   ].join(" | ");
 
   const currentStatusHelp =
@@ -492,14 +466,6 @@ function App() {
             onMouseLeave={handleCanvasMouseUp}
             onDoubleClick={handleCanvasDoubleClick}
             tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key.toLowerCase() !== "r" || viewMode !== "single") {
-                return;
-              }
-
-              event.preventDefault();
-              handleRotateClockwise();
-            }}
           >
             {images.length === 0 ? (
               <EmptyState />

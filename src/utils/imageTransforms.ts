@@ -2,12 +2,14 @@ export type TransformState = {
   zoom: number;
   x: number;
   y: number;
+  rotation: number;
 };
 
 export const DEFAULT_TRANSFORM: TransformState = {
   zoom: 100,
   x: 0,
   y: 0,
+  rotation: 0,
 };
 
 export function clampZoom(value: number) {
@@ -30,6 +32,7 @@ export function zoomAtPoint(
     zoom: nextZoom,
     x: pointerX - (pointerX - current.x) * scaleRatio,
     y: pointerY - (pointerY - current.y) * scaleRatio,
+    rotation: current.rotation,
   };
 }
 
@@ -43,5 +46,6 @@ export function composeTransforms(
     zoom: (globalTransform.zoom * localTransform.zoom) / 10000,
     x: globalTransform.x + localTransform.x * globalScale,
     y: globalTransform.y + localTransform.y * globalScale,
+    rotation: (globalTransform.rotation + localTransform.rotation) % 360,
   };
 }
