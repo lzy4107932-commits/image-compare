@@ -544,10 +544,10 @@ export default function MultiCompareView({ images }: Props) {
                   >
                     {t("singleImageZoom")} {local.zoom}%
                   </span>
-                </div>
 
-                <div className="grid-card-name" title={image.name}>
-                  {image.name}
+                  <div className="grid-card-name" title={image.name}>
+                    {image.name}
+                  </div>
                 </div>
               </div>
             );

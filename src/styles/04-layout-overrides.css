@@ -231,7 +231,7 @@
   width: var(--multi-grid-card-basis);
   height: var(--multi-grid-card-height);
   flex: 0 0 var(--multi-grid-card-basis);
-  border-radius: 3px;
+  border-radius: 2px;
   content-visibility: auto;
   contain-intrinsic-size: auto 250px;
 }
@@ -246,15 +246,41 @@
  * 留下明显空隙。改为 100%，让图片尽可能占满显示区域。
  */
 .grid-view.multi-compare-view .multi-compare-image-area img {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
 }
 
-/* 压缩每张图片底部的名称栏，但继续保留文件名 */
+/*
+ * 文件名改为画布内悬浮标签，不再单独占用图片下方 30px。
+ * 渐变底色保证明暗图片上都能辨认，同时不会遮挡图片主体太多。
+ */
 .grid-view.multi-compare-view .grid-card-name {
-  height: 30px;
-  padding: 0 6px;
-  line-height: 30px;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  left: 5px;
+  z-index: 3;
+
+  width: auto;
+  height: 24px;
+  padding: 0 7px;
+
+  color: rgb(255 255 255 / 92%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    rgb(12 14 18 / 82%) 0%,
+    rgb(12 14 18 / 62%) 72%,
+    rgb(12 14 18 / 28%) 100%
+  );
+  box-shadow: 0 1px 4px rgb(0 0 0 / 24%);
+
+  font-size: 11px;
+  line-height: 22px;
+  pointer-events: none;
 }
 /* ==================================================
    查看器顶部统一工具栏插槽

@@ -122,6 +122,11 @@ describe("comparison keyboard controls", () => {
     for (const image of screen.getAllByRole("img")) {
       expect(image.getAttribute("loading")).toBe("lazy");
       expect(image.getAttribute("decoding")).toBe("async");
+      expect(
+        image
+          .closest(".multi-compare-image-area")
+          ?.querySelector(".grid-card-name")?.textContent,
+      ).toBe(image.getAttribute("alt"));
     }
 
     await user.keyboard("+");
