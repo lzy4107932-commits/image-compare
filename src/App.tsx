@@ -139,6 +139,7 @@ function App() {
 
       if (action === "reset-view") {
         setZoom(100);
+        setRotation(0);
         setPan({
           x: 0,
           y: 0,
@@ -237,12 +238,14 @@ function App() {
     setZoom((currentZoom) => Math.max(currentZoom - 10, 10));
   }
 
-  function resetZoom() {
+  function resetView() {
     setZoom(100);
+    setRotation(0);
     setPan({
       x: 0,
       y: 0,
     });
+    setIsPanning(false);
   }
 
   function handleCanvasWheel(event: ReactWheelEvent<HTMLDivElement>) {
@@ -441,7 +444,7 @@ function App() {
             zoom={zoom}
             onZoomOut={zoomOut}
             onZoomIn={zoomIn}
-            onReset={resetZoom}
+            onReset={resetView}
             onRotate={handleRotateClockwise}
           />
 

@@ -1069,6 +1069,53 @@ button[aria-selected="true"]:not(:disabled) {
   min-width: 58px;
 }
 
+.viewer-toolbar:not(:has(.ab-toolbar-portal-center))
+  .multi-compare-toolbar-actions
+  .multi-zoom-value,
+.viewer-toolbar-actions .ab-transform-controls .ab-zoom-value {
+  min-width: 88px;
+}
+
+/* 旋转与复位使用不同图形、文字和色彩，避免只凭相似箭头判断。 */
+.zoom-controls .transform-action-button,
+.viewer-toolbar-actions .ab-transform-controls .transform-action-button,
+.multi-compare-toolbar-actions .transform-action-button {
+  min-width: max-content;
+  padding-right: 10px;
+  padding-left: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.zoom-controls .transform-rotate-button,
+.viewer-toolbar-actions .ab-transform-controls .transform-rotate-button,
+.multi-compare-toolbar-actions .transform-rotate-button {
+  color: var(--theme-accent);
+  border-color: color-mix(in srgb, var(--theme-accent) 48%, var(--theme-border));
+  background: color-mix(in srgb, var(--theme-accent) 12%, var(--theme-control));
+}
+
+.zoom-controls .transform-reset-button,
+.viewer-toolbar-actions .ab-transform-controls .transform-reset-button,
+.multi-compare-toolbar-actions .transform-reset-button {
+  color: var(--theme-text-secondary);
+  border-color: var(--theme-border);
+  background: var(--theme-control);
+}
+
+.zoom-controls .transform-rotate-button:hover:not(:disabled),
+.viewer-toolbar-actions
+  .ab-transform-controls
+  .transform-rotate-button:hover:not(:disabled),
+.multi-compare-toolbar-actions .transform-rotate-button:hover:not(:disabled) {
+  color: #ffffff;
+  border-color: var(--theme-accent);
+  background: var(--theme-accent);
+}
+
 /* ==================================================
    多图模式内部工具栏紧凑化
    ================================================== */

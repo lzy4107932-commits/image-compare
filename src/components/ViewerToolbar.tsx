@@ -2,6 +2,7 @@ import {
   Grid3X3,
   Image as ImageIcon,
   Maximize,
+  RotateCw,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -86,22 +87,26 @@ export default function ViewerToolbar({
         {viewMode === "single" && (
           <button
             type="button"
+            className="transform-action-button transform-rotate-button"
             onClick={onRotate}
             title={`${t("rotateClockwise")} 90° (R)`}
             aria-label={`${t("rotateClockwise")} 90°`}
           >
-            ↻
+            <RotateCw size={16} />
+            <span>{t("rotate90")}</span>
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={onReset}
+          <button
+            type="button"
+            className="transform-action-button transform-reset-button"
+            onClick={onReset}
           title={t("reset")}
           aria-label={t("reset")}
-        >
-          <Maximize size={17} />
-        </button>
+          >
+            <Maximize size={17} />
+            <span>{t("reset")}</span>
+          </button>
       </div>
     </div>
   );

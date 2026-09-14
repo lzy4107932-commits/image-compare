@@ -9,9 +9,9 @@ import { createPortal } from "react-dom";
 import {
   Columns2,
   Layers3,
+  Maximize,
   Minus,
   Plus,
-  RotateCcw,
   RotateCw,
 } from "lucide-react";
 import { useI18n } from "../useI18n";
@@ -476,6 +476,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
   }
 
   const operationZoom = getOperationTransform().zoom;
+  const operationRotation = getOperationTransform().rotation;
 
   const transformStyleA = {
     transform: `translate(${finalTransformA.x}px, ${finalTransformA.y}px) scale(${finalTransformA.zoom}) rotate(${finalTransformA.rotation}deg)`,
@@ -565,7 +566,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
               aria-label={t("currentZoom")}
               onClick={resetCurrentTransform}
             >
-              {operationZoom}%
+              {operationZoom}% · {operationRotation}°
             </button>
             <button
               type="button"
@@ -577,25 +578,32 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
             </button>
             <button
               type="button"
+              className="transform-action-button transform-reset-button"
               title={t("resetCurrentTitle")}
+              aria-label={t("resetCurrentTitle")}
               onClick={resetCurrentTransform}
             >
+              <Maximize size={15} />
               {t("resetCurrent")}
             </button>
             <button
               type="button"
+              className="transform-action-button transform-rotate-button"
               title={`${t("rotateCurrentTarget")} (R)`}
               aria-label={t("rotateCurrentTarget")}
               onClick={rotateCurrentTransform}
             >
               <RotateCw size={15} />
+              <span>{t("rotate90")}</span>
             </button>
             <button
               type="button"
+              className="transform-action-button transform-reset-button"
               title={t("resetAllTitle")}
+              aria-label={t("resetAllTitle")}
               onClick={resetAllTransforms}
             >
-              <RotateCcw size={15} />
+              <Maximize size={15} />
               {t("resetAll")}
             </button>
           </div>,

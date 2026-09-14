@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Grid3X3, Minus, Plus, RotateCcw, RotateCw } from "lucide-react";
+import { Grid3X3, Maximize, Minus, Plus, RotateCw } from "lucide-react";
 import { useI18n } from "../useI18n";
 import type { LocalImage } from "../types";
 import {
@@ -390,7 +390,7 @@ export default function MultiCompareView({ images }: Props) {
               aria-label={t("globalZoomLevel")}
               onClick={() => setGlobalTransform(DEFAULT_TRANSFORM)}
             >
-              {globalTransform.zoom}%
+              {globalTransform.zoom}% · {globalTransform.rotation}°
             </button>
 
             <button
@@ -404,19 +404,23 @@ export default function MultiCompareView({ images }: Props) {
 
             <button
               type="button"
-              title={t("resetAllTransforms")}
-              aria-label={t("resetAllTransforms")}
-              onClick={resetAllTransforms}
-            >
-              <RotateCcw size={16} />
-            </button>
-            <button
-              type="button"
+              className="transform-action-button transform-rotate-button"
               title={`${t("rotateAllImages")} (R)`}
               aria-label={t("rotateAllImages")}
               onClick={rotateAllImages}
             >
               <RotateCw size={16} />
+              <span>{t("rotate90")}</span>
+            </button>
+            <button
+              type="button"
+              className="transform-action-button transform-reset-button"
+              title={t("resetAllTransforms")}
+              aria-label={t("resetAllTransforms")}
+              onClick={resetAllTransforms}
+            >
+              <Maximize size={16} />
+              <span>{t("resetAll")}</span>
             </button>
           </div>,
           toolbarCenterTarget,
