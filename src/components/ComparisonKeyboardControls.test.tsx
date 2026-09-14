@@ -109,6 +109,11 @@ describe("comparison keyboard controls", () => {
       name: /Synchronized zoom level/,
     });
 
+    for (const image of screen.getAllByRole("img")) {
+      expect(image.getAttribute("loading")).toBe("lazy");
+      expect(image.getAttribute("decoding")).toBe("async");
+    }
+
     await user.keyboard("+");
     expect(globalZoom.textContent).toContain("110%");
     expect(globalZoom.getAttribute("aria-label")).toContain("110%");

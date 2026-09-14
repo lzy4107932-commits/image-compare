@@ -75,8 +75,11 @@ describe("ImageSidebar", () => {
 
   it("reports thumbnail decoding failures", () => {
     const props = renderSidebar();
+    const thumbnail = screen.getByRole("img", { name: "first.png" });
 
-    fireEvent.error(screen.getByRole("img", { name: "first.png" }));
+    expect(thumbnail.getAttribute("loading")).toBe("lazy");
+    expect(thumbnail.getAttribute("decoding")).toBe("async");
+    fireEvent.error(thumbnail);
 
     expect(props.onImageLoadError).toHaveBeenCalledWith("one");
   });

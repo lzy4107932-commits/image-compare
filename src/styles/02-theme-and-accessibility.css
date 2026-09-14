@@ -241,6 +241,8 @@ header.topbar .mode-switch > button:disabled svg {
   border-color: transparent;
   background: var(--theme-control);
   box-shadow: 0 1px 2px var(--theme-shadow);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 88px;
 }
 
 .image-item-select {

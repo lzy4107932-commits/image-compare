@@ -480,6 +480,7 @@ function App() {
                     <img
                       src={selectedImage.url}
                       alt={selectedImage.name}
+                      decoding="async"
                       draggable={false}
                       style={{
                         transform: `translate(${pan.x}px, ${pan.y}px) scale(${

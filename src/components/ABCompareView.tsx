@@ -649,6 +649,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                 <img
                   src={imageA.url}
                   alt={imageA.name}
+                  decoding="async"
                   draggable={false}
                   style={transformStyleA}
                 />
@@ -672,6 +673,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                 <img
                   src={imageB.url}
                   alt={imageB.name}
+                  decoding="async"
                   draggable={false}
                   style={transformStyleB}
                 />
@@ -693,6 +695,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                 className="ab-overlay-image"
                 src={imageA.url}
                 alt={imageA.name}
+                decoding="async"
                 draggable={false}
                 style={transformStyleA}
               />
@@ -707,6 +710,7 @@ export default function ABCompareView({ imageA, imageB, onHelpChange }: Props) {
                   className="ab-overlay-image"
                   src={imageB.url}
                   alt={imageB.name}
+                  decoding="async"
                   draggable={false}
                   style={transformStyleB}
                 />

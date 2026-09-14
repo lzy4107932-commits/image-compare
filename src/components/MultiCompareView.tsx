@@ -469,6 +469,8 @@ export default function MultiCompareView({ images }: Props) {
                   <img
                     src={image.url}
                     alt={image.name}
+                    loading="lazy"
+                    decoding="async"
                     draggable={false}
                     style={{
                       transform: `translate(${finalTransform.x}px, ${finalTransform.y}px) scale(${finalTransform.zoom}) rotate(${finalTransform.rotation}deg)`,

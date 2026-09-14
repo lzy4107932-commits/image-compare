@@ -68,6 +68,8 @@ export default function ImageSidebar({
                   <img
                     src={image.url}
                     alt={image.name}
+                    loading="lazy"
+                    decoding="async"
                     onError={() => onImageLoadError(image.id)}
                   />
 

@@ -216,6 +216,8 @@
 /* 缩小卡片边框圆角，减少视觉留白 */
 .grid-view.multi-compare-view .multi-compare-card {
   border-radius: 3px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 250px;
 }
 
 /* 图片区域不再额外留出内部空间 */
