@@ -62,7 +62,8 @@
     ],
     "win": {
       "icon": "build/icon.ico",
-      "target": "nsis"
+      "target": "nsis",
+      "artifactName": "Image-Compare-${version}-Windows-${arch}-Setup.${ext}"
     },
     "mac": {
       "icon": "build/icon.icns",
