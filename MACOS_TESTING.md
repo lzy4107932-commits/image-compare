@@ -27,7 +27,7 @@ Image-Compare-1.1.0-macOS-arm64.zip
 2. 把“图片对比工具”拖入“应用程序”。
 3. 第一次启动时，在 Finder 的“应用程序”中按住 Control 点击应用，选择“打开”，然后再次确认“打开”。
 
-当前安装包用于远端 Mac 功能测试，没有使用 Apple Developer 证书签名或公证，因此不能通过普通双击完成第一次启动。不要全局关闭 Gatekeeper。
+当前安装包使用 macOS ad-hoc 临时签名，解决 Apple Silicon 将完全未签名应用判断为“已损坏”的问题；但它仍没有 Apple Developer ID 证书和 Apple 公证，因此第一次启动可能仍需使用 Control 点击“打开”。不要全局关闭 Gatekeeper。
 
 ## 建议测试项目
 

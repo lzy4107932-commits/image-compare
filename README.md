@@ -124,7 +124,7 @@ Windows 安装包生成在本地 `release` 目录中，该目录不会提交到 
 
 ## macOS 测试版
 
-当前提供 Apple Silicon（M1/M2/M3/M4）ARM64 构建配置。DMG 需要在 macOS 环境中生成：
+当前提供 Apple Silicon（M1/M2/M3/M4）ARM64 构建配置，并使用适合内部测试的 macOS ad-hoc 签名。DMG 需要在 macOS 环境中生成：
 
 ```bash
 npm ci

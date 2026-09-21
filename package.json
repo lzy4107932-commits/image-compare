@@ -67,7 +67,7 @@
     "mac": {
       "icon": "build/icon.icns",
       "category": "public.app-category.photography",
-      "identity": null,
+      "identity": "-",
       "hardenedRuntime": false,
       "notarize": false,
       "artifactName": "Image-Compare-${version}-macOS-${arch}.${ext}",
