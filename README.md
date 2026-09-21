@@ -121,3 +121,16 @@ npm run electron:build
 ```
 
 Windows 安装包生成在本地 `release` 目录中，该目录不会提交到 Git 仓库。
+
+## macOS 测试版
+
+当前提供 Apple Silicon（M1/M2/M3/M4）ARM64 构建配置。DMG 需要在 macOS 环境中生成：
+
+```bash
+npm ci
+npm run check
+npm run electron:build:mac
+npm run smoke:packaged
+```
+
+生成的 DMG 和 ZIP 位于本地 `release` 目录。远端 Mac 的构建、安装和检查步骤见 [MACOS_TESTING.md](./MACOS_TESTING.md)。

@@ -7,6 +7,56 @@ if (isSmokeTest || process.env.IMAGE_COMPARE_DISABLE_GPU === "1") {
   app.disableHardwareAcceleration();
 }
 
+function configureApplicationMenu() {
+  if (process.platform !== "darwin") {
+    Menu.setApplicationMenu(null);
+    return;
+  }
+
+  const template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: "about" },
+        { type: "separator" },
+        { role: "services" },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideOthers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { role: "quit" },
+      ],
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "delete" },
+        { type: "separator" },
+        { role: "selectAll" },
+      ],
+    },
+    {
+      label: "View",
+      submenu: [{ role: "togglefullscreen" }],
+    },
+    {
+      label: "Window",
+      submenu: [
+        { role: "minimize" },
+        { role: "zoom" },
+        { type: "separator" },
+        { role: "front" },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1440,
@@ -14,7 +64,11 @@ function createWindow() {
     minWidth: 1000,
     minHeight: 650,
     title: "图片管理与对比",
-    icon: path.join(__dirname, "../build/icon.ico"),
+    ...(process.platform === "win32"
+      ? { icon: path.join(__dirname, "../build/icon.ico") }
+      : process.platform === "linux"
+        ? { icon: path.join(__dirname, "../build/icon.png") }
+        : {}),
     autoHideMenuBar: true,
     backgroundColor: "#181818",
     show: !isSmokeTest,
@@ -66,7 +120,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  Menu.setApplicationMenu(null);
+  configureApplicationMenu();
   createWindow();
 
   app.on("activate", () => {

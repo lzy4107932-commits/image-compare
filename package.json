@@ -15,7 +15,10 @@
     "smoke:electron": "node scripts/electron-smoke.cjs",
     "smoke:packaged": "node scripts/electron-smoke.cjs --packaged",
     "preview": "vite preview",
-    "electron:build": "npm run build && electron-builder"
+    "icons": "node src/generate-icons.mjs",
+    "electron:build": "npm run electron:build:win",
+    "electron:build:win": "npm run build && npm run icons && electron-builder --win nsis --x64",
+    "electron:build:mac": "npm run build && npm run icons && electron-builder --mac dmg zip --arm64"
   },
   "dependencies": {
     "lucide-react": "^1.34.0",
@@ -60,6 +63,50 @@
     "win": {
       "icon": "build/icon.ico",
       "target": "nsis"
+    },
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.photography",
+      "identity": null,
+      "hardenedRuntime": false,
+      "notarize": false,
+      "artifactName": "Image-Compare-${version}-macOS-${arch}.${ext}",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "dmg": {
+      "title": "图片对比工具 ${version}",
+      "icon": "build/icon.icns",
+      "backgroundColor": "#181818",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 140,
+          "y": 190,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 190,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "nsis": {
       "createDesktopShortcut": true,

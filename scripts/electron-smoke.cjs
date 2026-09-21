@@ -6,14 +6,45 @@ const path = require("path");
 const electronPath = require("electron");
 const projectDirectory = path.resolve(__dirname, "..");
 const usePackagedApplication = process.argv.includes("--packaged");
-const packagedExecutable = path.join(
-  projectDirectory,
-  "release",
-  "win-unpacked",
-  "图片对比工具.exe",
-);
 
-if (usePackagedApplication && !fs.existsSync(packagedExecutable)) {
+function findPackagedExecutable() {
+  const candidates =
+    process.platform === "darwin"
+      ? ["mac-arm64", "mac-universal", "mac"].map((directory) =>
+          path.join(
+            projectDirectory,
+            "release",
+            directory,
+            "图片对比工具.app",
+            "Contents",
+            "MacOS",
+            "图片对比工具",
+          ),
+        )
+      : process.platform === "win32"
+        ? [
+            path.join(
+              projectDirectory,
+              "release",
+              "win-unpacked",
+              "图片对比工具.exe",
+            ),
+          ]
+        : [
+            path.join(
+              projectDirectory,
+              "release",
+              "linux-unpacked",
+              "图片对比工具",
+            ),
+          ];
+
+  return candidates.find((candidate) => fs.existsSync(candidate));
+}
+
+const packagedExecutable = findPackagedExecutable();
+
+if (usePackagedApplication && !packagedExecutable) {
   console.error("Packaged application not found. Run npm run electron:build first.");
   process.exit(1);
 }
@@ -34,7 +65,7 @@ const child = spawn(
     IMAGE_COMPARE_SMOKE_TEST: "1",
   },
   stdio: ["ignore", "pipe", "pipe"],
-    windowsHide: true,
+    windowsHide: process.platform === "win32",
   },
 );
 
