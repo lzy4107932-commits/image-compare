@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - codex/macos-version
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-macos-arm64:
@@ -28,6 +30,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Read package version
+        id: package
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
       - name: Run checks
         run: npm run check
 
@@ -43,16 +49,33 @@ jobs:
       - name: Smoke-test packaged application
         run: npm run smoke:packaged
 
+      - name: Add installation guide to downloads
+        run: cp MACOS_INSTALL.txt release/MACOS_INSTALL.txt
+
       - name: Create checksums
         run: shasum -a 256 release/*.dmg release/*.zip > release/SHA256SUMS.txt
 
       - name: Upload macOS test package
         uses: actions/upload-artifact@v4
         with:
-          name: Image-Compare-1.1.0-macOS-arm64
+          name: Image-Compare-${{ steps.package.outputs.version }}-macOS-arm64
           path: |
             release/*.dmg
             release/*.zip
             release/SHA256SUMS.txt
+            release/MACOS_INSTALL.txt
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          release/*.dmg
+          release/*.zip
+          release/SHA256SUMS.txt
+          release/MACOS_INSTALL.txt
+          --title "图片对比工具 $GITHUB_REF_NAME"
+          --generate-notes

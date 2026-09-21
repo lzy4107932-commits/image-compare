@@ -2,9 +2,20 @@
 
 一款完全在本地运行的轻量桌面图片查看与对比工具。
 
-当前稳定版本：**1.1.0**
+当前稳定版本：**1.2.0**
 
 项目专注于单图查看、两图差异对比和少量多图同步观察，不提供批量修图、格式转换或复杂工作流处理功能。
+
+## 下载与系统支持
+
+安装包请前往 [GitHub Releases](https://github.com/lzy4107932-commits/image-compare/releases) 下载。
+
+| 系统 | 安装包 | 支持范围 |
+| --- | --- | --- |
+| Windows | `.exe` | Windows 10/11 x64 |
+| macOS | `.dmg` | Apple Silicon M1/M2/M3/M4，ARM64 |
+
+macOS 版没有付费 Apple Developer ID 签名和 Apple 公证。首次打开时，请进入“系统设置”→“隐私与安全性”，找到“图片对比工具”被阻止的提示并点击“仍要打开”（部分系统版本可能显示“仍要安装”）。安装包同时附带 `MACOS_INSTALL.txt` 完整说明，不需要全局关闭 Gatekeeper。
 
 ## 主要功能
 
@@ -78,6 +89,14 @@ _截图待上传：请在 GitHub 编辑本段，将多图模式截图放在这�
 
 为避免误操作和过高的内存占用，当前设置了单张图片 50 MiB、总容量 500 MiB 和最多 100 张的安全上限；这些上限是保护措施，不代表软件定位为批量处理工具。
 
+## 1.2.0 更新内容
+
+- 新增 Apple Silicon macOS 版本，支持 M1、M2、M3、M4 ARM64 设备。
+- 新增 DMG 和 ZIP 构建、ICNS 图标及 macOS 原生应用菜单。
+- macOS 安装包采用免费的 ad-hoc 技术签名，并增加严格签名校验。
+- 增加 macOS 打包后启动测试及首次打开安全提示说明。
+- 保持 Windows 版本功能和构建流程不变。
+
 ## 1.1.0 更新内容
 
 - 优化单图初始自适应显示与旋转后的尺寸计算。
@@ -122,9 +141,9 @@ npm run electron:build
 
 Windows 安装包生成在本地 `release` 目录中，该目录不会提交到 Git 仓库。
 
-## macOS 测试版
+## macOS 版本
 
-当前提供 Apple Silicon（M1/M2/M3/M4）ARM64 构建配置，并使用适合内部测试的 macOS ad-hoc 签名。DMG 需要在 macOS 环境中生成：
+当前提供 Apple Silicon（M1/M2/M3/M4）ARM64 构建配置，并使用免费的 macOS ad-hoc 技术签名。它不是付费 Apple Developer ID 签名，因此首次打开仍需要在“隐私与安全性”中确认。DMG 需要在 macOS 环境中生成：
 
 ```bash
 npm ci
@@ -133,4 +152,4 @@ npm run electron:build:mac
 npm run smoke:packaged
 ```
 
-生成的 DMG 和 ZIP 位于本地 `release` 目录。远端 Mac 的构建、安装和检查步骤见 [MACOS_TESTING.md](./MACOS_TESTING.md)。
+生成的 DMG、ZIP、校验文件和安装说明位于本地 `release` 目录。安装说明见 [MACOS_INSTALL.txt](./MACOS_INSTALL.txt)，远端 Mac 的构建与检查步骤见 [MACOS_TESTING.md](./MACOS_TESTING.md)。

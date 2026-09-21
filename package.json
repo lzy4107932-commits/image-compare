@@ -1,7 +1,7 @@
 {
   "name": "image-compare",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
@@ -92,7 +92,7 @@
       "backgroundColor": "#181818",
       "window": {
         "width": 540,
-        "height": 380
+        "height": 440
       },
       "contents": [
         {
@@ -105,6 +105,12 @@
           "y": 190,
           "type": "link",
           "path": "/Applications"
+        },
+        {
+          "x": 270,
+          "y": 340,
+          "type": "file",
+          "path": "MACOS_INSTALL.txt"
         }
       ]
     },

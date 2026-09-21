@@ -17,15 +17,16 @@ npm run smoke:packaged
 构建完成后，安装包位于 `release`：
 
 ```text
-Image-Compare-1.1.0-macOS-arm64.dmg
-Image-Compare-1.1.0-macOS-arm64.zip
+Image-Compare-1.2.0-macOS-arm64.dmg
+Image-Compare-1.2.0-macOS-arm64.zip
 ```
 
 ## 安装测试版
 
 1. 双击打开 DMG。
 2. 把“图片对比工具”拖入“应用程序”。
-3. 第一次启动时，在 Finder 的“应用程序”中按住 Control 点击应用，选择“打开”，然后再次确认“打开”。
+3. 第一次启动时如果受到系统阻止，打开“系统设置”→“隐私与安全性”，找到“图片对比工具”并点击“仍要打开”（部分系统版本可能显示“仍要安装”）。
+4. 也可以在 Finder 的“应用程序”中按住 Control 点击应用，选择“打开”，然后再次确认“打开”。
 
 当前安装包使用 macOS ad-hoc 临时签名，解决 Apple Silicon 将完全未签名应用判断为“已损坏”的问题；但它仍没有 Apple Developer ID 证书和 Apple 公证，因此第一次启动可能仍需使用 Control 点击“打开”。不要全局关闭 Gatekeeper。
 
