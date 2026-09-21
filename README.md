@@ -54,21 +54,17 @@ macOS 版没有付费 Apple Developer ID 签名和 Apple 公证。首次打开�
 
 ### 单图模式
 
-_截图待上传：请在 GitHub 编辑本段，将单图模式截图放在这里。_
+<img width="3070" height="1822" alt="image" src="https://github.com/user-attachments/assets/566a5c0e-e9ea-42f7-942d-da396a708030" />
 
-<!-- 单图模式截图位置 -->
 
 ### A/B 对比模式
 
-_截图待上传：请在 GitHub 编辑本段，将 A/B 左右或重叠对比截图放在这里。_
+<img width="3066" height="1824" alt="image" src="https://github.com/user-attachments/assets/8a6c6b70-32df-4b55-9168-9fcd74df405a" />
+<img width="3070" height="1828" alt="image" src="https://github.com/user-attachments/assets/95aca8a4-51c7-40eb-8a95-ff51b61a8e2d" />
 
-<!-- A/B 对比模式截图位置 -->
 
 ### 多图模式
-
-_截图待上传：请在 GitHub 编辑本段，将多图模式截图放在这里。_
-
-<!-- 多图模式截图位置 -->
+<img width="3070" height="1826" alt="image" src="https://github.com/user-attachments/assets/9a0193f9-005b-4053-8f94-2523e326814e" />
 
 ## 快捷操作
 
